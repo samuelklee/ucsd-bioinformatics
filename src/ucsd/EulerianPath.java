@@ -9,31 +9,38 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class EulerianPath {
-    public static String getTail(Map<String, List<String>> graph) {
+    public static Object getTail(Map<Object, List<Object>> graph) {
         //tail is unique string in union of keys and values in graph
-        List<String> findTail = new ArrayList<>(graph.keySet());
-        findTail.addAll(graph.values().stream().flatMap(l -> l.stream()).collect(Collectors.toSet()));
-        String tail = findTail.stream().reduce((a, b) -> new BigInteger(a).xor(new BigInteger(b)).toString())
-                .orElse(null);
+//        List<String> findTail = new ArrayList<>(graph.keySet());
+//        findTail.addAll(graph.values().stream().flatMap(l -> l.stream()).collect(Collectors.toSet()));
+//        String tail = findTail.stream().reduce((a, b) -> new BigInteger(a).xor(new BigInteger(b)).toString())
+//                .orElse(null);
 
-        if (tail.equals("0")) {
-            if (!graph.values().contains("0")) {
-                return null;
-            }
+//        if (tail.equals("0")) {
+//            if (!graph.values().contains("0")) {
+//                return null;
+//            }
+//        }
+
+        List<Object> findTail = graph.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+        findTail.removeAll(graph.keySet());
+
+        if (findTail.isEmpty()) {
+            return null;
         }
 
-        return tail;
+        return findTail.get(0);
     }
 
-    public static String getHead(Map<String, List<String>> graph) {
+    public static Object getHead(Map<Object, List<Object>> graph) {
         //map of nodes -> outgoing edge count; count number of values for each key in graph
-        Map<String, Integer> outCount = graph.entrySet().stream()
+        Map<Object, Integer> outCount = graph.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size()));
         //map of nodes -> ingoing edge count; count occurrences of key in values for each key in graph
-        Map<String, Long> inCount = graph.values().stream().flatMap(l -> l.stream())
+        Map<Object, Long> inCount = graph.values().stream().flatMap(l -> l.stream())
                 .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
 
-        for (String node : outCount.keySet()) {
+        for (Object node : outCount.keySet()) {
             if (outCount.get(node) != (long) inCount.getOrDefault(node, (long) 0)) {
                 return node;
             }
@@ -42,12 +49,14 @@ public class EulerianPath {
         return null;
     }
 
-    public static Map<String, List<String>> balance(Map<String, List<String>> graph){
-        Map<String, List<String>> balancedGraph = new HashMap<>(graph);
-        String tail = getTail(graph);
-        String head = getHead(graph);
+    public static Map<Object, List<Object>> balance(Map<Object, List<Object>> graph){
+        Map<Object, List<Object>> balancedGraph = new HashMap<>(graph);
+        Object tail = getTail(graph);
+        Object head = getHead(graph);
 
-        if (tail == null) {
+//        System.out.println(tail + " " + head);
+
+        if (tail == null || head == null) {
             return balancedGraph;
         }
 
@@ -59,28 +68,45 @@ public class EulerianPath {
         return balancedGraph;
     }
 
+    /**
+     * Balance graph and get Eulerian path.
+     * @param graph unbalanced graph with Eulerian path
+     * @return      list of nodes visited
+     */
+    public static LinkedList<Object> getNodesVisited(Map<Object, List<Object>> graph) {
+        Map<Object, List<Object>> balancedGraph = balance(graph);
+
+        Object startNode;
+        if (balancedGraph.equals(graph)) {
+            startNode = graph.keySet().toArray()[0];
+        } else {
+            startNode = getTail(graph);
+        }
+
+        EulerianCycle cycle = new EulerianCycle(balancedGraph);
+
+        LinkedList<Object> nodesVisited = cycle.getNodesVisited(startNode);
+        nodesVisited.add(startNode);
+        nodesVisited.remove(0);
+
+        return nodesVisited;
+    }
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
 
-        Map<String, List<String>> graph = new HashMap<>();
+        Map<Object, List<Object>> graph = new HashMap<>();
 
         String edgeInputString;
         while ((edgeInputString = br.readLine()) != null) {
             String[] nodeStrings = edgeInputString.split(" -> ");
             String node1 = nodeStrings[0];
-            List<String> node2 = new ArrayList<>(Arrays.asList(nodeStrings[1].split(",")));
+            List<Object> node2 = new ArrayList<>(Arrays.asList(nodeStrings[1].split(",")));
             graph.put(node1, node2);
         }
 
-        Map<String, List<String>> balancedGraph = balance(graph);
-        String startNode = getTail(graph);
+        LinkedList<Object> nodesVisited = getNodesVisited(graph);
 
-        EulerianCycle cycle = new EulerianCycle(balancedGraph);
-
-        List<String> nodesVisited = cycle.getNodesVisited(startNode);
-        nodesVisited.add(startNode);
-        nodesVisited.remove(0);
-
-        System.out.println(nodesVisited.stream().collect(Collectors.joining("->")));
+        System.out.println(nodesVisited.stream().map(o -> o.toString()).collect(Collectors.joining("->")));
     }
 }

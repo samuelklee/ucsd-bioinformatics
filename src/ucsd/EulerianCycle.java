@@ -8,10 +8,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class EulerianCycle {
-    private Map<String, List<String>> graph;
-    private Set<String> nodesVisitedWithUnusedEdges = new HashSet<>();
+    private Map<Object, List<Object>> graph;
+    private Set<Object> nodesVisitedWithUnusedEdges = new HashSet<>();
 
-    public EulerianCycle(Map<String, List<String>> graph) {
+    public EulerianCycle(Map<Object, List<Object>> graph) {
         this.graph = graph;
     }
 
@@ -19,7 +19,7 @@ public class EulerianCycle {
      * Nested class for constructing both subcycles and Eulerian cycle.
      */
     private class Cycle {
-        private LinkedList<String> nodesVisited = new LinkedList<>();
+        private LinkedList<Object> nodesVisited = new LinkedList<>();
 
         private Random random = new Random();
 
@@ -29,19 +29,19 @@ public class EulerianCycle {
          * @param startNode                     starting node
          * @return                              cycle starting at given node
          */
-        public Cycle(String startNode) {
+        public Cycle(Object startNode) {
 //            System.out.println(EulerianCycle.this.graph);
-            String currentNode = startNode;
-            String nextNode;
+            Object currentNode = startNode;
+            Object nextNode;
             do {
                 this.nodesVisited.offer(currentNode);
-                List<String> nextNodes = EulerianCycle.this.graph.get(currentNode);
+                List<Object> nextNodes = EulerianCycle.this.graph.get(currentNode);
 
                 if (nextNodes.size() > 1) {
                     //if more than one available next node, add current node to set of nodes with unused edges and
                     //pick next node randomly
                     EulerianCycle.this.nodesVisitedWithUnusedEdges.add(currentNode);
-                    nextNode = (String) nextNodes.toArray()[this.random.nextInt(nextNodes.size())];
+                    nextNode = nextNodes.toArray()[this.random.nextInt(nextNodes.size())];
                     nextNodes.remove(nextNode);
                 } else {
                     //if only one available next node, pick it and remove current node from set of nodes with unused edges
@@ -52,12 +52,12 @@ public class EulerianCycle {
                 currentNode = nextNode;
                 //stop when hitting a dead end node
             } while (EulerianCycle.this.graph.containsKey(nextNode));
-//            System.out.println(this.nodesVisited.stream().collect(Collectors.joining("->")));
+//            System.out.println(this.nodesVisited.stream().map(o -> o.toString()).collect(Collectors.joining("->")));
 //            System.out.println(EulerianCycle.this.graph);
         }
 
         // Constructor for starting with list of nodes visited.  Use this to construct Eulerian cycle from subcycles.
-        public Cycle(LinkedList<String> nodesVisited) {
+        public Cycle(LinkedList<Object> nodesVisited) {
             this.nodesVisited = new LinkedList<>(nodesVisited);
         }
 
@@ -66,8 +66,8 @@ public class EulerianCycle {
          * @param startNode node to start list at
          * @return          list of visited nodes
          */
-        public LinkedList<String> getNodesVisited(String startNode) {
-            LinkedList<String> reorderedNodesVisited = new LinkedList<>();
+        public LinkedList<Object> getNodesVisited(Object startNode) {
+            LinkedList<Object> reorderedNodesVisited = new LinkedList<>();
 
             int numNodesVisited = this.nodesVisited.size();
             int startIndex = this.nodesVisited.indexOf(startNode);
@@ -83,34 +83,34 @@ public class EulerianCycle {
 
     /**
      * Return an Eulerian cycle, given the adjacency list for a de Brujin graph.
-     * @return      list of Strings giving cycle
+     * @return      list of Objects giving cycle
      */
-    public LinkedList<String> getNodesVisited() {
+    public LinkedList<Object> getNodesVisited() {
 
         Random random = new Random();
 
         //form an initial cycle by randomly walking
-        Set<String> nodeSet = this.graph.keySet();
-        String startNode = (String) nodeSet.toArray()[random.nextInt(nodeSet.size())];
+        Set<Object> nodeSet = this.graph.keySet();
+        Object startNode = nodeSet.toArray()[random.nextInt(nodeSet.size())];
         Cycle subcycle = new Cycle(startNode);
 
         while (!this.graph.isEmpty()) {
-//            System.out.println("Nodes visited with edges remaining: " + subcycle.getNodesVisitedWithUnusedEdges());
+//            System.out.println("Nodes visited with edges remaining: " + this.nodesVisitedWithUnusedEdges);
 
             //randomly pick new start node from set of nodes with unused edges visited in previous cycles
             int startIndex = random.nextInt(this.nodesVisitedWithUnusedEdges.size());
-            startNode = (String) this.nodesVisitedWithUnusedEdges.toArray()[startIndex];
+            startNode = this.nodesVisitedWithUnusedEdges.toArray()[startIndex];
 
             //get new cycle starting from new start node
             Cycle subcyclePrime = new Cycle(startNode);
-            List<String> subcyclePrimeNodesVisited = subcyclePrime.getNodesVisited(startNode);
+            List<Object> subcyclePrimeNodesVisited = subcyclePrime.getNodesVisited(startNode);
 
             //loop previous cycle starting at new start node and join new cycle
-            LinkedList<String> nodesVisited = new LinkedList<>();
+            LinkedList<Object> nodesVisited = new LinkedList<>();
             nodesVisited.addAll(subcycle.getNodesVisited(startNode));
             nodesVisited.addAll(subcyclePrimeNodesVisited);
             subcycle = new Cycle(nodesVisited);
-//            System.out.println("Cycle + subcycle: " + nodesVisited.stream().collect(Collectors.joining("->")));
+//            System.out.println("Cycle + subcycle: " + nodesVisited.stream().map(o -> o.toString()).collect(Collectors.joining("->")));
         }
 
         return subcycle.getNodesVisited(startNode);
@@ -119,9 +119,9 @@ public class EulerianCycle {
     /**
      * Return an Eulerian cycle, given the adjacency list for a de Brujin graph and a specified starting node.
      * @param startNode starting node
-     * @return          list of Strings giving cycle
+     * @return          list of Objects giving cycle
      */
-    public LinkedList<String> getNodesVisited(String startNode) {
+    public LinkedList<Object> getNodesVisited(Object startNode) {
         Cycle subcycle = new Cycle(getNodesVisited());
         return subcycle.getNodesVisited(startNode);
     }
@@ -129,21 +129,21 @@ public class EulerianCycle {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
 
-        Map<String, List<String>> graph = new HashMap<>();
+        Map<Object, List<Object>> graph = new HashMap<>();
 
-        String edgeInputString;
+        Object edgeInputString;
         while ((edgeInputString = br.readLine()) != null) {
-            String[] nodeStrings = edgeInputString.split(" -> ");
-            String node1 = nodeStrings[0];
-            List<String> node2 = new ArrayList<>(Arrays.asList(nodeStrings[1].split(",")));
+            Object[] nodeStrings = edgeInputString.toString().split(" -> ");
+            Object node1 = nodeStrings[0];
+            List<Object> node2 = new ArrayList<>(Arrays.asList(nodeStrings[1].toString().split(",")));
             graph.put(node1, node2);
         }
 
         EulerianCycle cycle = new EulerianCycle(graph);
 
-        List<String> nodesVisited = cycle.getNodesVisited();
+        List<Object> nodesVisited = cycle.getNodesVisited();
         nodesVisited.add(nodesVisited.get(0));
 
-        System.out.println(nodesVisited.stream().collect(Collectors.joining("->")));
+        System.out.println(nodesVisited.stream().map(o -> o.toString()).collect(Collectors.joining("->")));
     }
 }

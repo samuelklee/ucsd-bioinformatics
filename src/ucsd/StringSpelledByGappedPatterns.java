@@ -14,7 +14,7 @@ public class StringSpelledByGappedPatterns {
      * @param gappedPatterns    list of (k,d)-mers
      * @return                  text reconstructed from (k,d)-mers
      */
-    private static String getString(int k, int d, List<GappedPattern> gappedPatterns) {
+    public static String getString(int k, int d, List<GappedPattern> gappedPatterns) {
         List<String> firstPatterns = new ArrayList<>();
         List<String> secondPatterns = new ArrayList<>();
 

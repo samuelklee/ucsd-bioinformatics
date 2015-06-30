@@ -13,47 +13,35 @@ import java.util.TreeMap;
 
 public class DeBrujinGraphFromGappedPatterns {
     /**
-     * Return the de Brujin graph for a set of patterns as an adjacency list.  Get OverlapGraph adjacency list and then
+     * Return the de Brujin graph for a set of gapped patterns as an adjacency list.  Get OverlapGraph adjacency list and then
      * group by keys.  Return as sorted hash map with nodes as keys and list of outgoing edges as values.
-     * @param patterns  set of k-mers
-     * @return          adjacency list for nodes in de Brujin graph
+     * @param gappedPatterns    set of (k,d)-mers
+     * @return                  adjacency list for nodes in de Brujin graph
      */
-    public static Map<String, List<String>> getDeBrujinAdjacency(List<String> patterns) {
-        Map<String, List<String>> deBrujinAdjacency = new TreeMap<>();
+    public static Map<Object, List<Object>> getDeBrujinAdjacency(List<GappedPattern> gappedPatterns) {
+        Map<Object, List<Object>> deBrujinAdjacency = new TreeMap<>();
 
-        for (String pattern : patterns) {
-            String prefix = pattern.substring(0, pattern.length() - 1);
-            String suffix = pattern.substring(1, pattern.length());
-            String originNode = prefix;
-            String destinationNode = suffix;
+        for (GappedPattern gappedPattern : gappedPatterns) {
+            String pattern1 = gappedPattern.getPattern1();
+            String pattern2 = gappedPattern.getPattern2();
+            String prefix1 = pattern1.substring(0, pattern1.length() - 1);
+            String prefix2 = pattern2.substring(0, pattern2.length() - 1);
+            String suffix1 = pattern1.substring(1, pattern1.length());
+            String suffix2 = pattern2.substring(1, pattern2.length());
+
+            GappedPattern prefix = new GappedPattern(prefix1, prefix2);
+            GappedPattern suffix = new GappedPattern(suffix1, suffix2);
+            Object originNode = prefix;
+            Object destinationNode = suffix;
             if (deBrujinAdjacency.containsKey(originNode)) {
                 deBrujinAdjacency.get(originNode).add(destinationNode);
             } else {
-                List<String> edgeList = new ArrayList<>();
+                List<Object> edgeList = new ArrayList<>();
                 edgeList.add(destinationNode);
                 deBrujinAdjacency.put(originNode, edgeList);
             }
         }
 
         return deBrujinAdjacency;
-    }
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
-
-        List<String> patterns = new ArrayList<>();
-
-        String read;
-        while ((read = br.readLine()) != null) {
-            patterns.add(read);
-        }
-
-        Map<String, List<String>> deBrujinAdjacency = getDeBrujinAdjacency(patterns);
-
-        for (Map.Entry<String, List<String>> nodeEdges : deBrujinAdjacency.entrySet()) {
-            System.out.print(nodeEdges.getKey() + " -> ");
-            String edges = StringUtils.join(nodeEdges.getValue(), ",");
-            System.out.println(edges);
-        }
     }
 }

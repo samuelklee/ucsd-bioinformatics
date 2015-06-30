@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeBrujinGraphFromPatterns {
     /**
@@ -15,8 +16,8 @@ public class DeBrujinGraphFromPatterns {
      * @param patterns  set of k-mers
      * @return          adjacency list for nodes in de Brujin graph
      */
-    public static Map<String, List<String>> getDeBrujinAdjacency(List<String> patterns) {
-        Map<String, List<String>> deBrujinAdjacency = new TreeMap<>();
+    public static Map<Object, List<Object>> getDeBrujinAdjacency(List<String> patterns) {
+        Map<Object, List<Object>> deBrujinAdjacency = new TreeMap<>();
 
         for (String pattern : patterns) {
             String prefix = pattern.substring(0, pattern.length() - 1);
@@ -28,7 +29,7 @@ public class DeBrujinGraphFromPatterns {
             } else {
                 List<String> edgeList = new ArrayList<>();
                 edgeList.add(destinationNode);
-                deBrujinAdjacency.put(originNode, edgeList);
+                deBrujinAdjacency.put(originNode, edgeList.stream().map(s -> (Object) s).collect(Collectors.toList()));
             }
         }
 
@@ -45,9 +46,9 @@ public class DeBrujinGraphFromPatterns {
             patterns.add(read);
         }
 
-        Map<String, List<String>> deBrujinAdjacency = getDeBrujinAdjacency(patterns);
+        Map<Object, List<Object>> deBrujinAdjacency = getDeBrujinAdjacency(patterns);
 
-        for (Map.Entry<String, List<String>> nodeEdges : deBrujinAdjacency.entrySet()) {
+        for (Map.Entry<Object, List<Object>> nodeEdges : deBrujinAdjacency.entrySet()) {
             System.out.print(nodeEdges.getKey() + " -> ");
             String edges = StringUtils.join(nodeEdges.getValue(), ",");
             System.out.println(edges);
