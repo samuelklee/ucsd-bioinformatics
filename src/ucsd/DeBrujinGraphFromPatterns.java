@@ -22,14 +22,12 @@ public class DeBrujinGraphFromPatterns {
         for (String pattern : patterns) {
             String prefix = pattern.substring(0, pattern.length() - 1);
             String suffix = pattern.substring(1, pattern.length());
-            String originNode = prefix;
-            String destinationNode = suffix;
+            Object originNode = prefix;
+            Object destinationNode = suffix;
             if (deBrujinAdjacency.containsKey(originNode)) {
                 deBrujinAdjacency.get(originNode).add(destinationNode);
             } else {
-                List<String> edgeList = new ArrayList<>();
-                edgeList.add(destinationNode);
-                deBrujinAdjacency.put(originNode, edgeList.stream().map(s -> (Object) s).collect(Collectors.toList()));
+                deBrujinAdjacency.put(originNode, new ArrayList<>(Arrays.asList(destinationNode)));
             }
         }
 

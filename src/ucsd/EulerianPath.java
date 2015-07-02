@@ -4,7 +4,6 @@ package ucsd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,13 +34,14 @@ public class EulerianPath {
     public static Object getHead(Map<Object, List<Object>> graph) {
         //map of nodes -> outgoing edge count; count number of values for each key in graph
         Map<Object, Integer> outCount = graph.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size()));
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
         //map of nodes -> ingoing edge count; count occurrences of key in values for each key in graph
-        Map<Object, Long> inCount = graph.values().stream().flatMap(l -> l.stream())
-                .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
+        Map<Object, Integer> inCount = graph.values().stream().flatMap(l -> l.stream())
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting())).entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().intValue()));
 
         for (Object node : outCount.keySet()) {
-            if (outCount.get(node) != (long) inCount.getOrDefault(node, (long) 0)) {
+            if (outCount.get(node) != inCount.getOrDefault(node, 0)) {
                 return node;
             }
         }

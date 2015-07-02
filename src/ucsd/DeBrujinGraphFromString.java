@@ -26,9 +26,7 @@ public class DeBrujinGraphFromString {
             if (deBrujinAdjacency.containsKey(originNode)) {
                 deBrujinAdjacency.get(originNode).add(destinationNode);
             } else {
-                List<String> edgeList = new ArrayList<>();
-                edgeList.add(destinationNode);
-                deBrujinAdjacency.put(originNode, edgeList);
+                deBrujinAdjacency.put(originNode, new ArrayList<>(Arrays.asList(destinationNode)));
             }
         }
 

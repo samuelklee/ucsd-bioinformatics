@@ -69,12 +69,12 @@ public class EulerianCycle {
         public LinkedList<Object> getNodesVisited(Object startNode) {
             LinkedList<Object> reorderedNodesVisited = new LinkedList<>();
 
-            int numNodesVisited = this.nodesVisited.size();
-            int startIndex = this.nodesVisited.indexOf(startNode);
+            int numNodesVisited = nodesVisited.size();
+            int startIndex = nodesVisited.indexOf(startNode);
 
-            reorderedNodesVisited.addAll(this.nodesVisited.subList(startIndex, numNodesVisited));
+            reorderedNodesVisited.addAll(nodesVisited.subList(startIndex, numNodesVisited));
             if (startIndex > 0) {
-                reorderedNodesVisited.addAll(this.nodesVisited.subList(0, startIndex));
+                reorderedNodesVisited.addAll(nodesVisited.subList(0, startIndex));
             }
 
             return reorderedNodesVisited;
@@ -90,16 +90,16 @@ public class EulerianCycle {
         Random random = new Random();
 
         //form an initial cycle by randomly walking
-        Set<Object> nodeSet = this.graph.keySet();
+        Set<Object> nodeSet = graph.keySet();
         Object startNode = nodeSet.toArray()[random.nextInt(nodeSet.size())];
         Cycle subcycle = new Cycle(startNode);
 
-        while (!this.graph.isEmpty()) {
-//            System.out.println("Nodes visited with edges remaining: " + this.nodesVisitedWithUnusedEdges);
+        while (!graph.isEmpty()) {
+//            System.out.println("Nodes visited with edges remaining: " + nodesVisitedWithUnusedEdges);
 
             //randomly pick new start node from set of nodes with unused edges visited in previous cycles
-            int startIndex = random.nextInt(this.nodesVisitedWithUnusedEdges.size());
-            startNode = this.nodesVisitedWithUnusedEdges.toArray()[startIndex];
+            int startIndex = random.nextInt(nodesVisitedWithUnusedEdges.size());
+            startNode = nodesVisitedWithUnusedEdges.toArray()[startIndex];
 
             //get new cycle starting from new start node
             Cycle subcyclePrime = new Cycle(startNode);
