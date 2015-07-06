@@ -60,7 +60,7 @@ public class MaximalNonBranchingPaths {
                     paths.add(isolatedCycle);
                     break;
                 }
-//                oneInOneOutNodes.remove(nextNode);
+                oneInOneOutNodes.remove(nextNode);
                 isolatedCycle.add(nextNode);
                 nextNode = graph.get(nextNode).get(0);
             }

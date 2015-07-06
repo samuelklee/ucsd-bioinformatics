@@ -18,8 +18,8 @@ public class DeBrujinGraphFromGappedPatterns {
             String pattern2 = gappedPattern.getPattern2();
             String prefix1 = pattern1.substring(0, pattern1.length() - 1);
             String prefix2 = pattern2.substring(0, pattern2.length() - 1);
-            String suffix1 = pattern1.substring(1, pattern1.length());
-            String suffix2 = pattern2.substring(1, pattern2.length());
+            String suffix1 = pattern1.substring(1);
+            String suffix2 = pattern2.substring(1);
 
             GappedPattern prefix = new GappedPattern(prefix1, prefix2);
             GappedPattern suffix = new GappedPattern(suffix1, suffix2);

@@ -21,7 +21,7 @@ public class DeBrujinGraphFromPatterns {
 
         for (String pattern : patterns) {
             String prefix = pattern.substring(0, pattern.length() - 1);
-            String suffix = pattern.substring(1, pattern.length());
+            String suffix = pattern.substring(1);
             Object originNode = prefix;
             Object destinationNode = suffix;
             if (deBrujinAdjacency.containsKey(originNode)) {
