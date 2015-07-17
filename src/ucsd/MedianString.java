@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class MedianString {
     private static final int LARGE_NUMBER = 100000;
     /**
-     * Return minimum distance for pattern vs. all k-mers in texts (i.e., sum of minimum Hamming distance over k-mers
+     * Returns minimum distance for pattern vs. all k-mers in texts (i.e., sum of minimum Hamming distance over k-mers
      * in each text).
      * @param texts     texts to search within
      * @param pattern   pattern to compare against

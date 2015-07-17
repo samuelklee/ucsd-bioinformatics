@@ -145,7 +145,7 @@ public class GreedyMotifSearch {
             texts.add(text);
         }
 
-//        List<String> motifs = getMotifs(texts, k, t);
+//        List<String> motifs = getMotifs(tezxts, k, t);
         List<String> motifs = getMotifsWithPseudocounts(texts, k, t);
 
         System.out.println(motifs.stream().collect(Collectors.joining("\n")));
