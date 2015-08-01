@@ -3,12 +3,15 @@ package ucsd;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MotifEnumeration {
     /**
-     * Returns set of k-mers present in list of texts;
+     * Returns set of k-mers present in list of texts.
      * @param texts list of texts to search within
      * @param k     length of k-mer
      * @return      set of k-mers
