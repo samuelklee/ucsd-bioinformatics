@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class OverlapGraph {
     /**
@@ -24,8 +25,8 @@ public class OverlapGraph {
      * @param patterns  collection of k-mers
      * @return          adjacency list for patterns
      */
-    public static List<AbstractMap.SimpleEntry<String, String>> getOverlapAdjacency(List<String> patterns) {
-        List<AbstractMap.SimpleEntry<String, String>> overlapAdjacency = new ArrayList<>();
+    public static List<Map.Entry<String, String>> getOverlapAdjacency(List<String> patterns) {
+        List<Map.Entry<String, String>> overlapAdjacency = new ArrayList<>();
         for (int i = 0; i < patterns.size(); i++) {
             for (int j = 0; j < patterns.size(); j++) {
                 if (i != j) {
@@ -51,9 +52,9 @@ public class OverlapGraph {
             patterns.add(read);
         }
 
-        List<AbstractMap.SimpleEntry<String, String>> overlapAdjacency = getOverlapAdjacency(patterns);
+        List<Map.Entry<String, String>> overlapAdjacency = getOverlapAdjacency(patterns);
 
-        for (AbstractMap.SimpleEntry<String, String> edge : overlapAdjacency) {
+        for (Map.Entry<String, String> edge : overlapAdjacency) {
             System.out.println(edge.getKey() + " -> " + edge.getValue());
         }
     }
