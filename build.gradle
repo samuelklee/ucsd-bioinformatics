@@ -11,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    testCompile 'org.testng:testng:6.9.4'
-    testCompile 'org.apache.commons:commons-math3:3.5'
-    testCompile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.testng:testng:6.9.4'
+    compile 'org.apache.commons:commons-math3:3.5'
+    compile 'org.apache.commons:commons-lang3:3.4'
 }
 
 test {
