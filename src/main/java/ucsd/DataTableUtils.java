@@ -3,8 +3,7 @@ package ucsd;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DataTableUtils {
     public static Map<String, String> getCodonToAminoTable() throws IOException {
@@ -61,5 +60,25 @@ public class DataTableUtils {
             }
         }
         return aminoMassTable;
+    }
+
+    public static Map<Map.Entry, Integer> getScoringMatrix(String fileName) throws IOException {
+        Map<Map.Entry, Integer> scoringMatrix = new HashMap<>();
+        try (BufferedReader data = new BufferedReader(new FileReader(fileName))) {
+            String headerRow = data.readLine();
+            List<String> aminoColumns = new ArrayList<>(Arrays.asList(headerRow.split("\\s+")));
+            aminoColumns.remove(0);
+            for(String line = data.readLine(); line != null; line = data.readLine()) {
+                List<String> tokens = Arrays.asList(line.split("\\s+"));
+                String aminoRow = tokens.get(0);
+                for (int i = 1; i < tokens.size(); i++) {
+                    int score = Integer.parseInt(tokens.get(i));
+                    scoringMatrix.put(
+                            new AbstractMap.SimpleEntry(aminoRow.charAt(0), aminoColumns.get(i - 1).charAt(0)),
+                            score);
+                }
+            }
+        }
+        return scoringMatrix;
     }
 }
