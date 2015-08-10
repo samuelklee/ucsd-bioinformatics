@@ -19,5 +19,11 @@ public class FittingAlignmentTest {
         //alignments might not match
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void testQuiz() {
+        String result = FittingAlignment.doWork("src/test/resources/III/sample/FittingAlignmentQuiz.txt");
+        System.out.println(result);
+    }
 }
 
