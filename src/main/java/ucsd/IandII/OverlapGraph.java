@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class OverlapGraph {
     /**
-     * Check to see if two strings overlap.
+     * Check to see if two strings overlap by a single character.
      * @param a first string
      * @param b second string
      * @return  boolean giving overlap
@@ -21,21 +21,18 @@ public class OverlapGraph {
     }
 
     /**
-     * Returns adjacency list of collection of k-mers that overlap.
+     * Returns adjacency list of collection of k-mers that overlap by a single character.
      * @param patterns  collection of k-mers
      * @return          adjacency list for patterns
      */
     public static List<Map.Entry<String, String>> getOverlapAdjacency(List<String> patterns) {
         List<Map.Entry<String, String>> overlapAdjacency = new ArrayList<>();
-        for (int i = 0; i < patterns.size(); i++) {
-            for (int j = 0; j < patterns.size(); j++) {
-                if (i != j) {
-                    String a = patterns.get(i);
-                    String b = patterns.get(j);
-                    if (isOverlap(a, b)) {
-                        overlapAdjacency.add(new AbstractMap.SimpleEntry<>(a, b));
+        for (String pattern1 : patterns) {
+            for (String pattern2 : patterns) {
+                if (!pattern1.equals(pattern2)) {
+                    if (isOverlap(pattern1, pattern2)) {
+                        overlapAdjacency.add(new AbstractMap.SimpleEntry<>(pattern1, pattern2));
                     }
-
                 }
             }
         }
