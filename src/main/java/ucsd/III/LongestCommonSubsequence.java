@@ -91,7 +91,7 @@ public class LongestCommonSubsequence {
     }
 
     public static void main(String[] args) throws IOException {
-        String result = doWork("src/test/resources/III/dataset_245_5.txt");
+        String result = doWork("src/test/resources/III//sample/MultipleLongestCommonSubsequence.txt"); //dataset_245_5.txt");
         System.out.println(result);
     }
 }
