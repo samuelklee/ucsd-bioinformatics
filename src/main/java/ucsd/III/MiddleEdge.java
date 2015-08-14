@@ -8,12 +8,37 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MiddleEdge {
     private enum Action {
         INSERTION, MATCH
+    }
+
+    public static Action getPreviousActionFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
+                                                             String v, String w,
+                                                             int[] previousColumnLengths, int previousColumnIndex,
+                                                             int rowIndex) {
+        int[] columnLengths = new int[v.length() + 1];
+        columnLengths[0] = previousColumnLengths[0] - indelPenalty;
+        for (int i = 1; i <= v.length(); i++) {
+            int matchScore = scoringMatrix.get(new AbstractMap.SimpleEntry(
+                    v.charAt(i - 1), w.charAt(previousColumnIndex)));
+            List<Integer> newLengths = Arrays.asList(
+                    previousColumnLengths[i - 1] + matchScore,
+                    previousColumnLengths[i] - indelPenalty,
+                    columnLengths[i - 1] - indelPenalty);
+            int indexOfLongest = IntStream.range(0, newLengths.size()).boxed()
+                    .max(Comparator.comparing(n -> newLengths.get(n))).get();
+            columnLengths[i] = newLengths.get(indexOfLongest);
+            if (i == rowIndex) {
+                switch (indexOfLongest) {
+                    case 0: return Action.MATCH;
+                    case 1: return Action.INSERTION;
+                }
+            }
+        }
+        return null;
     }
 
     public static int[] getColumnLengthsFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
@@ -68,28 +93,8 @@ public class MiddleEdge {
         return columnLengths;
     }
 
-    public static int getNodeRowIndex(int[] columnLengths) {
+    public static int getMaxNodeRowIndex(int[] columnLengths) {
         return IntStream.range(0, columnLengths.length).boxed().max(Comparator.comparing(i -> columnLengths[i])).get();
-    }
-
-
-
-//    public static Action getMiddleNodeAction(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
-//                                             int middleNodeRow, int middleNodeLength,
-//                                             String v, String w) {
-//        int middleColumn = w.length() / 2;
-//
-//    }
-
-    public static int getNodeAfterMiddleNodeRow(int middleNodeRow, Action middleNodeAction) {
-        switch (middleNodeAction) {
-            case INSERTION:
-                return middleNodeRow;
-            case MATCH:
-                return middleNodeRow + 1;
-            default:
-                throw new RuntimeException("Middle edge should not have DELETION action.");
-        }
     }
 
     public static String doWork(String dataFileName) {
@@ -119,17 +124,20 @@ public class MiddleEdge {
 
             int middleColumnIndex = w.length() / 2;
             int[] middleColumnLengths = getColumnLengths(scoringMatrix, indelPenalty, v, w, middleColumnIndex);
-            int middleNodeRowIndex = getNodeRowIndex(middleColumnLengths);
             int[] nextToMiddleColumnLengths = getColumnLengthsFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
                     middleColumnLengths, middleColumnIndex);
-            int nextToMiddleNodeRowIndex = getNodeRowIndex(nextToMiddleColumnLengths);
+            int nextToMiddleNodeMaxRowIndex = getMaxNodeRowIndex(nextToMiddleColumnLengths);
 
-//            Action middleNodeAction = getMiddleNodeAction(scoringMatrix, indelPenalty,
-//                    middleNodeRow, middleNodeLength, v, w);
-//            int nodeAfterMiddleNodeRow = getNodeAfterMiddleNodeRow(middleNodeRow, middleNodeAction);
+            Action middleEdgeAction = getPreviousActionFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
+                    middleColumnLengths, middleColumnIndex, nextToMiddleNodeMaxRowIndex);
+
+            int middleNodeRowIndex = nextToMiddleNodeMaxRowIndex;
+            if (middleEdgeAction == Action.MATCH) {
+                middleNodeRowIndex = nextToMiddleNodeMaxRowIndex - 1;
+            }
 
             return ConsoleCapturer.toString("(" + middleNodeRowIndex + ", " + middleColumnIndex + ") (" +
-                    nextToMiddleNodeRowIndex + ", " + (middleColumnIndex + 1) + ")");
+                    nextToMiddleNodeMaxRowIndex + ", " + (middleColumnIndex + 1) + ")");
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
         }
