@@ -12,6 +12,13 @@ public class MiddleEdgeTest {
     }
 
     @Test
+    public void test2() {
+        String result = MiddleEdge.doWork("src/test/resources/III/sample/MiddleEdge2.txt");
+        String expected = "(2, 4) (2, 5)";
+        Assert.assertEquals(result, expected);
+    }
+
+    @Test
     public void testExtra() {
         String result = MiddleEdge.doWork("src/test/resources/III/sample/MiddleEdgeExtra.txt");
         String expected = "(512, 510) (513, 511)";

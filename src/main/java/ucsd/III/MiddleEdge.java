@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MiddleEdge {
@@ -17,16 +18,16 @@ public class MiddleEdge {
 
     public static Action getPreviousActionFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
                                                              String v, String w,
-                                                             int[] previousColumnLengths, int previousColumnIndex,
+                                                             int[] previousColumnLengthsFromSource, int previousColumnIndex,
                                                              int rowIndex) {
         int[] columnLengths = new int[v.length() + 1];
-        columnLengths[0] = previousColumnLengths[0] - indelPenalty;
+        columnLengths[0] = previousColumnLengthsFromSource[0] - indelPenalty;
         for (int i = 1; i <= v.length(); i++) {
             int matchScore = scoringMatrix.get(new AbstractMap.SimpleEntry(
                     v.charAt(i - 1), w.charAt(previousColumnIndex)));
             List<Integer> newLengths = Arrays.asList(
-                    previousColumnLengths[i - 1] + matchScore,
-                    previousColumnLengths[i] - indelPenalty,
+                    previousColumnLengthsFromSource[i - 1] + matchScore,
+                    previousColumnLengthsFromSource[i] - indelPenalty,
                     columnLengths[i - 1] - indelPenalty);
             int indexOfLongest = IntStream.range(0, newLengths.size()).boxed()
                     .max(Comparator.comparing(n -> newLengths.get(n))).get();
@@ -41,18 +42,18 @@ public class MiddleEdge {
         return null;
     }
 
-    public static int[] getColumnLengthsFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
-                                                           String v, String w,
-                                                           int[] previousColumnLengths, int previousColumnIndex) {
+    public static int[] getColumnLengthsToSourceFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
+                                                                   String v, String w,
+                                                                   int[] previousColumnLengthsFromSource, int previousColumnIndex) {
         int[] columnLengths = new int[v.length() + 1];
-        columnLengths[0] = previousColumnLengths[0] - indelPenalty;
+        columnLengths[0] = previousColumnLengthsFromSource[0] - indelPenalty;
         for (int i = 1; i <= v.length(); i++) {
             int matchScore = scoringMatrix.get(new AbstractMap.SimpleEntry(
                     v.charAt(i - 1), w.charAt(previousColumnIndex)));
             columnLengths[i] = Collections.max(Arrays.asList(
-                    previousColumnLengths[i] - indelPenalty,
-                    columnLengths[i - 1] - indelPenalty,
-                    previousColumnLengths[i - 1] + matchScore));
+                    previousColumnLengthsFromSource[i - 1] + matchScore,
+                    previousColumnLengthsFromSource[i] - indelPenalty,
+                    columnLengths[i - 1] - indelPenalty));
         }
         return columnLengths;
     }
@@ -65,7 +66,7 @@ public class MiddleEdge {
         }
         int[] columnLengths = previousColumnLengths;
         for (int j = 1; j <= columnIndex; j++) {
-            columnLengths = getColumnLengthsFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
+            columnLengths = getColumnLengthsToSourceFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
                     previousColumnLengths, j - 1);
             previousColumnLengths = columnLengths;
         }
@@ -123,13 +124,12 @@ public class MiddleEdge {
 //            }
 
             int middleColumnIndex = w.length() / 2;
-            int[] middleColumnLengths = getColumnLengths(scoringMatrix, indelPenalty, v, w, middleColumnIndex);
-            int[] nextToMiddleColumnLengths = getColumnLengthsFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
-                    middleColumnLengths, middleColumnIndex);
+            int[] middleColumnLengthsFromSource = getColumnLengthsFromSource(scoringMatrix, indelPenalty, v, w, middleColumnIndex);
+            int[] nextToMiddleColumnLengths = getColumnLengths(scoringMatrix, indelPenalty, v, w, middleColumnIndex + 1);
             int nextToMiddleNodeMaxRowIndex = getMaxNodeRowIndex(nextToMiddleColumnLengths);
 
             Action middleEdgeAction = getPreviousActionFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
-                    middleColumnLengths, middleColumnIndex, nextToMiddleNodeMaxRowIndex);
+                    middleColumnLengthsFromSource, middleColumnIndex, nextToMiddleNodeMaxRowIndex);
 
             int middleNodeRowIndex = nextToMiddleNodeMaxRowIndex;
             if (middleEdgeAction == Action.MATCH) {

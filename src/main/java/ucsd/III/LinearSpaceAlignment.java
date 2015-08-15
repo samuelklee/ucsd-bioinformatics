@@ -17,30 +17,30 @@ public class LinearSpaceAlignment {
     }
 
     private static class Node {
-        private int row, column, length;
+        private int row;
         private Action action;
 
-        public Node(int row, int column, int length, Action action) {
+        public Node(int row, Action action) {
             this.row = row;
-            this.column = column;
-            this.length = length;
             this.action = action;
         }
     }
 
     public static Action getPreviousActionFromPreviousColumn(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
                                                              String v, String w,
-                                                             int[] previousColumnLengths, int previousColumnIndex,
+                                                             int[] previousColumnLengthsFromSource, int previousColumnIndex,
                                                              int rowIndex) {
         int[] columnLengths = new int[v.length() + 1];
-        columnLengths[0] = previousColumnLengths[0] - indelPenalty;
+        if (rowIndex == 0) {
+            return Action.INSERTION;
+        }
+        columnLengths[0] = previousColumnLengthsFromSource[0] - indelPenalty;
         for (int i = 1; i <= v.length(); i++) {
             int matchScore = scoringMatrix.get(new AbstractMap.SimpleEntry(
                     v.charAt(i - 1), w.charAt(previousColumnIndex)));
-
             List<Integer> newLengths = Arrays.asList(
-                    previousColumnLengths[i - 1] + matchScore,
-                    previousColumnLengths[i] - indelPenalty,
+                    previousColumnLengthsFromSource[i - 1] + matchScore,
+                    previousColumnLengthsFromSource[i] - indelPenalty,
                     columnLengths[i - 1] - indelPenalty);
             int indexOfLongest = IntStream.range(0, newLengths.size()).boxed()
                     .max(Comparator.comparing(n -> newLengths.get(n))).get();
@@ -49,6 +49,7 @@ public class LinearSpaceAlignment {
                 switch (indexOfLongest) {
                     case 0: return Action.MATCH;
                     case 1: return Action.INSERTION;
+                    case 2: throw new RuntimeException("Middle edge should not be a DELETION.");
                 }
             }
         }
@@ -56,24 +57,27 @@ public class LinearSpaceAlignment {
     }
 
     public static Node getMiddleNode(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
-                                          String v, String w, int left, int right) {
-        int middleColumnIndex = (left + right) / 2;
-        int[] middleColumnLengths = MiddleEdge.getColumnLengths(scoringMatrix, indelPenalty, v, w, middleColumnIndex);
-        int[] nextToMiddleColumnLengths = MiddleEdge.getColumnLengthsFromPreviousColumn(scoringMatrix, indelPenalty,
-                v, w, middleColumnLengths, middleColumnIndex);
+                                     String v, String w,
+                                     int top, int bottom, int left, int right) {
+        String vCut = v.substring(top, bottom);
+        String wCut = w.substring(left, right);
+
+        int middleColumnIndex = wCut.length() / 2;
+        int[] middleColumnLengthsFromSource = MiddleEdge.getColumnLengthsFromSource(scoringMatrix, indelPenalty, vCut, wCut, middleColumnIndex);
+        int[] nextToMiddleColumnLengths = MiddleEdge.getColumnLengths(scoringMatrix, indelPenalty, vCut, wCut, middleColumnIndex + 1);
         int nextToMiddleNodeMaxRowIndex = MiddleEdge.getMaxNodeRowIndex(nextToMiddleColumnLengths);
 
-        Action middleEdgeAction = getPreviousActionFromPreviousColumn(scoringMatrix, indelPenalty, v, w,
-                middleColumnLengths, middleColumnIndex, nextToMiddleNodeMaxRowIndex);
+        Action middleEdgeAction = getPreviousActionFromPreviousColumn(scoringMatrix, indelPenalty, vCut, wCut,
+                middleColumnLengthsFromSource, middleColumnIndex, nextToMiddleNodeMaxRowIndex);
 
         int middleNodeRowIndex = nextToMiddleNodeMaxRowIndex;
         if (middleEdgeAction == Action.MATCH) {
-            middleNodeRowIndex = nextToMiddleNodeMaxRowIndex - 1;
+            middleNodeRowIndex--;
         }
 
-        int middleNodeLength = middleColumnLengths[middleNodeRowIndex];
+        middleNodeRowIndex += top;
 
-        return new Node(middleNodeRowIndex, middleColumnIndex, middleNodeLength, middleEdgeAction);
+        return new Node(middleNodeRowIndex, middleEdgeAction);
     }
 
     public static String getLongestPath(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty, String v, String w,
@@ -92,44 +96,24 @@ public class LinearSpaceAlignment {
         }
 
         int middle = (left + right) / 2;
-        Node middleNode = getMiddleNode(scoringMatrix, indelPenalty, v, w, left, right);
+        Node middleNode = getMiddleNode(scoringMatrix, indelPenalty, v, w, top, bottom, left, right);
         int middleNodeRow = middleNode.row;
-        String path = getLongestPath(scoringMatrix, indelPenalty, v, w, top, middleNodeRow, left, middle);
-        path += middleNode.action.toString() + " ";
+        System.out.println(middleNodeRow + " " + middle + " " + middleNode.action);
+        StringBuilder pathStringBuilder = new StringBuilder();
+        pathStringBuilder.append(getLongestPath(scoringMatrix, indelPenalty, v, w, top, middleNodeRow, left, middle));
+        pathStringBuilder.append(middleNode.action.toString() + " ");
+//        String path = getLongestPath(scoringMatrix, indelPenalty, v, w, top, middleNodeRow, left, middle);
+//        path += middleNode.action.toString() + " ";
         if (middleNode.action == Action.INSERTION || middleNode.action == Action.MATCH) {
             middle = middle + 1;
         }
         if (middleNode.action == Action.MATCH) {
             middleNodeRow = middleNodeRow + 1;
         }
-        path += getLongestPath(scoringMatrix, indelPenalty, v, w, middleNodeRow, bottom, middle, right);
-        return path;
-    }
-
-    public static int getLengthFromPath(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
-                                        String path, String v, String w) {
-        int length, i, j;
-        length = i = j = 0;
-        List<String> actions = Arrays.asList(path.split("\\s+"));
-        for (String action : actions) {
-            switch (action) {
-                case "MATCH":
-                    length += scoringMatrix.get(new AbstractMap.SimpleEntry(
-                            v.charAt(i), w.charAt(j)));
-                    i++;
-                    j++;
-                    break;
-                case "INSERTION":
-                    length -= indelPenalty;
-                    j++;
-                    break;
-                case "DELETION":
-                    length -= indelPenalty;
-                    i++;
-                    break;
-            }
-        }
-        return length;
+        pathStringBuilder.append(getLongestPath(scoringMatrix, indelPenalty, v, w,
+                middleNodeRow, bottom, middle, right));
+//        path += getLongestPath(scoringMatrix, indelPenalty, v, w, middleNodeRow, bottom, middle, right);
+        return pathStringBuilder.toString();
     }
 
     public static List<String> getAlignmentFromPath(String path, String v, String w) {
@@ -159,6 +143,32 @@ public class LinearSpaceAlignment {
         return Arrays.asList(vAlign, wAlign);
     }
 
+    public static int getLengthFromPath(Map<Map.Entry, Integer> scoringMatrix, int indelPenalty,
+                                        String path, String v, String w) {
+        int length, i, j;
+        length = i = j = 0;
+        List<String> actions = Arrays.asList(path.split("\\s+"));
+        for (String action : actions) {
+            switch (action) {
+                case "MATCH":
+                    length += scoringMatrix.get(new AbstractMap.SimpleEntry(
+                            v.charAt(i), w.charAt(j)));
+                    i++;
+                    j++;
+                    break;
+                case "INSERTION":
+                    length -= indelPenalty;
+                    j++;
+                    break;
+                case "DELETION":
+                    length -= indelPenalty;
+                    i++;
+                    break;
+            }
+        }
+        return length;
+    }
+
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
             String v = br.readLine();
@@ -173,6 +183,7 @@ public class LinearSpaceAlignment {
 
             int length = getLengthFromPath(scoringMatrix, indelPenalty, path, v, w);
             List<String> alignment = getAlignmentFromPath(path, v, w);
+//            System.out.println(path);
 
             return ConsoleCapturer.toString(length + "\n" + alignment.stream().collect(Collectors.joining("\n")));
         } catch (IOException e) {
