@@ -8,7 +8,7 @@ public class MultipleLongestCommonSubsequenceTest {
     public void test() {
         String result = MultipleLongestCommonSubsequence.doWork("src/test/resources/III/sample/MultipleLongestCommonSubsequence.txt").split("\n")[0];
         String expected = "3";
-        //alignments may not match
+        //alignments might not match
         Assert.assertEquals(result, expected);
     }
 
@@ -16,8 +16,14 @@ public class MultipleLongestCommonSubsequenceTest {
     public void testExtra() {
         String result = MultipleLongestCommonSubsequence.doWork("src/test/resources/III/sample/MultipleLongestCommonSubsequenceExtra.txt").split("\n")[0];
         String expected = "11";
-        //alignments may not match
+        //alignments might not match
         Assert.assertEquals(result, expected);
+    }
+
+    @Test
+    public void testQuiz() {
+        String result = MultipleLongestCommonSubsequence.doWork("src/test/resources/III/sample/MultipleLongestCommonSubsequenceQuiz.txt");
+        System.out.println(result);
     }
 }
 

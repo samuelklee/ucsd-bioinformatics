@@ -7,7 +7,9 @@ public class GlobalAlignmentTest {
     @Test
     public void test() {
         String result = GlobalAlignment.doWork("src/test/resources/III/sample/GlobalAlignment.txt");
-        String expected = "8\n" + "PLEASANTLY\n" + "-MEA--N-LY";
+        String expected = "8\n" +
+                "PLEASANTLY\n" +
+                "-MEA--N-LY";
         Assert.assertEquals(result, expected);
     }
 

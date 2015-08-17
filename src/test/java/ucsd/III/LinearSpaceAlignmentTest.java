@@ -26,7 +26,7 @@ public class LinearSpaceAlignmentTest {
     public void testExtra() {
         String result = LinearSpaceAlignment.doWork("src/test/resources/III/sample/LinearSpaceAlignmentExtra.txt").split("\n")[0];
         String expected = "1387";
-        //alignments may not match
+        //alignments might not match
         Assert.assertEquals(result, expected);
     }
 
@@ -34,7 +34,7 @@ public class LinearSpaceAlignmentTest {
     public void testGlobalAlignmentExtra() {
         String result = LinearSpaceAlignment.doWork("src/test/resources/III/sample/GlobalAlignmentExtra.txt").split("\n")[0];
         String expected = "1555";
-        //alignments may not match
+        //alignments might not match
         Assert.assertEquals(result, expected);
     }
 }
