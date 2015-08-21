@@ -17,5 +17,11 @@ public class BreakpointsTest {
         String expected = "178";
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void testQuiz() {
+        String result = Breakpoints.doWork("src/test/resources/III/sample/BreakpointsQuiz.txt");
+        System.out.println(result);
+    }
 }
 

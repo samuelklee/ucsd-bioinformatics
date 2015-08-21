@@ -2,7 +2,6 @@ package ucsd.III;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import ucsd.III.LongestCommonSubsequence;
 
 public class LongestCommonSubsequenceTest {
     @Test

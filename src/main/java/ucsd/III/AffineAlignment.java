@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class AffineAlignment {
     private static final int NEGATIVE_INFINITY = -100000;

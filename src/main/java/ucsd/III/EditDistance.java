@@ -5,7 +5,9 @@ import ucsd.ConsoleCapturer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class EditDistance {
     private enum Action {
