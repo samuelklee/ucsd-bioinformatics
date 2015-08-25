@@ -81,4 +81,24 @@ public class DataTableUtils {
         }
         return scoringMatrix;
     }
+
+    public static List<String> readFASTA(String dataFileName) throws IOException {
+        List<String> data = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
+            String line;
+            StringBuilder sequence = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                if (line.length() == 0 || line.charAt(0) == '>') {
+                    if (sequence.length() > 0) {
+                        data.add(sequence.toString());
+                    }
+                    sequence.setLength(0);
+                } else {
+                    sequence.append(line);
+                }
+            }
+            data.add(sequence.toString());
+        }
+        return data;
+    }
 }

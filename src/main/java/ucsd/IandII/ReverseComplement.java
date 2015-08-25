@@ -3,8 +3,19 @@ package ucsd.IandII;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReverseComplement {
+    public static Map<Character, Character> complementMap = new HashMap<>();
+    static {
+        complementMap.put('A', 'T');
+        complementMap.put('C', 'G');
+        complementMap.put('G', 'C');
+        complementMap.put('T', 'A');
+    }
+
+
     /**
      * Returns the complement of a string (i.e., A->T, C->G, G->C, T->A)
      * @param pattern   string
@@ -13,16 +24,7 @@ public class ReverseComplement {
     public static String getComplement(String pattern) {
         StringBuilder complement = new StringBuilder(pattern);
         for (int i = 0; i < pattern.length(); i++) {
-            switch (pattern.charAt(i)) {
-                case 'A':   complement.setCharAt(i,'T');
-                    break;
-                case 'T':   complement.setCharAt(i,'A');
-                    break;
-                case 'C':   complement.setCharAt(i,'G');
-                    break;
-                case 'G':   complement.setCharAt(i,'C');
-                    break;
-            }
+            complement.setCharAt(i, complementMap.get(pattern.charAt(i)));
         }
         return complement.toString();
     }
