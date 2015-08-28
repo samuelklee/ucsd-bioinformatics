@@ -5,37 +5,38 @@ import ucsd.ConsoleCapturer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TwoBreakOnGenome {
-    public static List<Integer> getCycle(List<Integer> chromosome) {
-        List<Integer> cycle = new ArrayList<>(2*chromosome.size());
-        for (int j = 1; j <= chromosome.size(); j++) {
-            int i = chromosome.get(j);
-            if (i > 0) {
-                cycle.set(2*j - 1, 2*i - 1);
-                cycle.set(2*j, 2*i);
-            } else {
-                cycle.set(2*j - 1, -2*i);
-                cycle.set(2*j, -2*i - 1);
-            }
-        }
-        return cycle;
+    public static List<List<Integer>> doTwoBreak(List<List<Integer>> genome, List<Integer> twoBreak) {
+        List<Map.Entry<Integer, Integer>> edges = ColoredEdges.getEdges(genome);
+//        System.out.println(edges);
+
+        List<Map.Entry<Integer, Integer>> edgesAfterTwoBreak = TwoBreakOnGenomeGraph.doTwoBreak(edges, twoBreak);
+//        System.out.println(edgesAfterTwoBreak);
+        return GraphToGenome.getGenome(edgesAfterTwoBreak);
     }
 
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
 
-            String[] chromosomeStrings = br.readLine().replaceAll("\\(|\\)", "").split("\\s+");
-            List<Integer> chromosome = Arrays.stream(chromosomeStrings).map(Integer::parseInt)
+            String[] genomeStrings = br.readLine().split("\\)\\(");
+            List<List<Integer>> genome = Arrays.stream(genomeStrings)
+                    .map(s -> Arrays.stream(s.replaceAll("\\(|\\)", "").split("\\s+")).map(Integer::parseInt)
+                            .collect(Collectors.toList()))
                     .collect(Collectors.toList());
 
-            List<Integer> cycle = getCycle(chromosome);
+            List<Integer> twoBreak = Arrays.stream(br.readLine().split(", ")).map(Integer::parseInt)
+                    .collect(Collectors.toList());
 
-            String result = "(" + cycle.stream().map(String::valueOf).collect(Collectors.joining(" ")) + ")";
+            List<List<Integer>> genomeAfterTwoBreak = doTwoBreak(genome, twoBreak);
+
+            String result = genomeAfterTwoBreak.stream()
+                    .map(l -> "(" + l.stream().map(i -> String.format("%+d", i)).collect(Collectors.joining(" ")) + ")")
+                    .collect(Collectors.joining(""));
+
             return ConsoleCapturer.toString(result);
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
@@ -43,7 +44,7 @@ public class TwoBreakOnGenome {
     }
 
     public static void main(String[] args) throws IOException {
-        String result = doWork("src/test/resources/III/sample/ChromosomeToCycle.txt");
+        String result = doWork("src/test/resources/III/dataset_8224_3.txt");
         System.out.println(result);
     }
 }

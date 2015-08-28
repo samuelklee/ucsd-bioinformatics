@@ -11,25 +11,38 @@ import java.util.stream.Collectors;
 public class GraphToGenome {
     public static List<List<Integer>> getCycles(List<Map.Entry<Integer, Integer>> edges) {
         List<List<Integer>> cycles = new ArrayList<>();
-        boolean isNewCycle = true;
-        int firstElementOfCycle = -1;
+        int lastNodeOfBlackEdge = -1;
+        int lastNodeOfColoredEdge = -1;
         for (Map.Entry<Integer, Integer> edge : edges) {
             int first = edge.getKey();
             int second = edge.getValue();
-            if (isNewCycle) {
-                firstElementOfCycle = first;
+
+            if (first != lastNodeOfBlackEdge && second != lastNodeOfBlackEdge) {
+                if (cycles.size() >= 1) {
+                    Collections.rotate(cycles.get(cycles.size() - 1), 1);
+                }
                 cycles.add(new ArrayList<>());
-                isNewCycle = false;
+                lastNodeOfBlackEdge = -1;
             }
-            cycles.get(cycles.size() - 1).add(first);
-            if ((cycles.get(cycles.size() - 1).size() > 1 && (second == firstElementOfCycle + 1 || second == firstElementOfCycle - 1)) ||
-                    (Math.max(first, second) == Math.min(first, second) + 1 && Math.max(first, second) % 2 == 0)) {
-                cycles.get(cycles.size() - 1).add(0, second);
-                isNewCycle = true;
-            } else {
+            if (first == lastNodeOfBlackEdge || lastNodeOfBlackEdge == -1) {
+                cycles.get(cycles.size() - 1).add(first);
                 cycles.get(cycles.size() - 1).add(second);
+                lastNodeOfColoredEdge = second;
+            } else if (second == lastNodeOfBlackEdge) {
+                cycles.get(cycles.size() - 1).add(second);
+                cycles.get(cycles.size() - 1).add(first);
+                lastNodeOfColoredEdge = first;
+            }
+
+            if (lastNodeOfColoredEdge != -1) {
+                if (lastNodeOfColoredEdge % 2 == 0) {
+                    lastNodeOfBlackEdge = lastNodeOfColoredEdge - 1;
+                } else {
+                    lastNodeOfBlackEdge = lastNodeOfColoredEdge + 1;
+                }
             }
         }
+        Collections.rotate(cycles.get(cycles.size() - 1), 1);
         return cycles;
     }
 
