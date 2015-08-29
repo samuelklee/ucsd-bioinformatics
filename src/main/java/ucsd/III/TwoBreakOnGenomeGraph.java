@@ -9,6 +9,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TwoBreakOnGenomeGraph {
+    public static List<Map.Entry<Integer, Integer>> sortEdges(List<Map.Entry<Integer, Integer>> edges) {
+        List < Map.Entry < Integer, Integer >> sortedEdges = new ArrayList<>(edges);
+        Collections.sort(sortedEdges, (edge1, edge2) ->
+                Math.min(edge1.getKey(), edge1.getValue()) - Math.min(edge2.getKey(), edge2.getValue()));
+        return sortedEdges;
+    }
+
     public static List<Map.Entry<Integer, Integer>> doTwoBreak(List<Map.Entry<Integer, Integer>> edges,
                                                                List<Integer> twoBreak) {
         List<Map.Entry<Integer, Integer>> edgesAfterTwoBreak = new ArrayList<>(edges);
