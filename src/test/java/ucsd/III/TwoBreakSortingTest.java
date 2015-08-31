@@ -3,6 +3,10 @@ package ucsd.III;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class TwoBreakSortingTest {
     @Test
     public void test() {
@@ -11,7 +15,19 @@ public class TwoBreakSortingTest {
                 "(+1 -2 -3)(+4)\n" +
                 "(+1 -2 -4 -3)\n" +
                 "(-3 +1 +2 -4)";
-        Assert.assertEquals(result, expected);
+        Set<Integer> resultSet = Arrays.stream(result.split("\n")[result.split("\n").length - 1].split("\\)\\("))
+                .map(s -> Arrays.stream(s.replaceAll("\\(|\\)", "").split(" "))
+                        .map(Integer::valueOf)
+                        .mapToInt(Math::abs)
+                        .sum())
+                .collect(Collectors.toSet());
+        Set<Integer> expectedSet = Arrays.stream(expected.split("\n")[expected.split("\n").length - 1].split("\\)\\("))
+                .map(s -> Arrays.stream(s.replaceAll("\\(|\\)", "").split(" "))
+                        .map(Integer::valueOf)
+                        .mapToInt(Math::abs)
+                        .sum())
+                .collect(Collectors.toSet());
+        Assert.assertEquals(resultSet, expectedSet);
     }
 
     @Test
@@ -29,7 +45,19 @@ public class TwoBreakSortingTest {
                 "(-2 +10 -8)(+5 +7 -14 -1 -11 +3 +4 +13 +6 +12 +9)\n" +
                 "(+5 +7 -14 -1 -11 +10 -8 -2 +3 +4 +13 +6 +12 +9)\n" +
                 "(+5 +7 -14 -1 -11 +8 -10 -2 +3 +4 +13 +6 +12 +9)";
-        Assert.assertEquals(result, expected);
+        Set<Integer> resultSet = Arrays.stream(result.split("\n")[result.split("\n").length - 1].split("\\)\\("))
+                .map(s -> Arrays.stream(s.replaceAll("\\(|\\)", "").split(" "))
+                        .map(Integer::valueOf)
+                        .mapToInt(Math::abs)
+                        .sum())
+                .collect(Collectors.toSet());
+        Set<Integer> expectedSet = Arrays.stream(expected.split("\n")[expected.split("\n").length - 1].split("\\)\\("))
+                .map(s -> Arrays.stream(s.replaceAll("\\(|\\)", "").split(" "))
+                        .map(Integer::valueOf)
+                        .mapToInt(Math::abs)
+                        .sum())
+                .collect(Collectors.toSet());
+        Assert.assertEquals(resultSet, expectedSet);
     }
 }
 
