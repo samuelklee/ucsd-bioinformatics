@@ -72,9 +72,8 @@ public class PeptideSpectrum {
         BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
 
         String peptide = br.readLine();
-
-        List<Integer> peptideSpectrum = getLinearSpectrum(peptide);
-//        List<Integer> peptideSpectrum = getCyclicSpectrum(peptide);
+//        List<Integer> peptideSpectrum = getLinearSpectrum(peptide);
+        List<Integer> peptideSpectrum = getCyclicSpectrum(peptide);
 
         System.out.println(peptideSpectrum.stream().map(i -> i.toString()).collect(Collectors.joining(" ")));
     }

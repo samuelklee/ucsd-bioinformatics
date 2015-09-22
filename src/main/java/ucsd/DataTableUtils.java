@@ -8,7 +8,7 @@ import java.util.*;
 public class DataTableUtils {
     public static Map<String, String> getCodonToAminoTable() throws IOException {
         Map<String, String> rnaCodonTable = new HashMap<>();
-        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/test/resources/RNACodonTable.txt"))) {
+        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/RNACodonTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
                 String[] tokens = line.split("\\s+");
                 for (int i = 0; i < tokens.length; i += 2) {
@@ -23,7 +23,7 @@ public class DataTableUtils {
 
     public static Map<String, Integer> getAminoCountsTable() throws IOException {
         Map<String, Integer> aminoCountsTable = new HashMap<>();
-        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/test/resources/RNACodonTable.txt"))) {
+        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/RNACodonTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()){
                 String[] tokens = line.split("\\s+");
                 for (int i = 0; i < tokens.length; i += 2) {
@@ -38,7 +38,7 @@ public class DataTableUtils {
 
     public static Map<String, Integer> getAminoMassTable() throws IOException {
         Map<String, Integer> aminoMassTable = new HashMap<>();
-        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/test/resources/AminoMassTable.txt"))) {
+        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/AminoMassTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
                 String[] tokens = line.split("\\s+");
                 String amino = tokens[0];
@@ -51,7 +51,7 @@ public class DataTableUtils {
 
     public static Map<String, Integer> getAminoMassTableNoDuplicates() throws IOException {
         Map<String, Integer> aminoMassTable = new HashMap<>();
-        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/test/resources/AminoMassTableNoDuplicates.txt"))) {
+        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/AminoMassTableNoDuplicates.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
                 String[] tokens = line.split("\\s+");
                 String amino = tokens[0];
