@@ -1,12 +1,13 @@
 package ucsd;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
 public class DataTableUtils {
-    public static Map<String, String> getCodonToAminoTable() throws IOException {
+    public static Map<String, String> getCodonToAminoTable() {
         Map<String, String> rnaCodonTable = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/RNACodonTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
@@ -17,11 +18,13 @@ public class DataTableUtils {
                     rnaCodonTable.put(codon, amino);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("RNA codon table not found.");
         }
         return rnaCodonTable;
     }
 
-    public static Map<String, Integer> getAminoCountsTable() throws IOException {
+    public static Map<String, Integer> getAminoCountsTable() {
         Map<String, Integer> aminoCountsTable = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/RNACodonTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()){
@@ -32,11 +35,13 @@ public class DataTableUtils {
                     aminoCountsTable.put(amino, currentCount + 1);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("RNA codon table not found.");
         }
         return aminoCountsTable;
     }
 
-    public static Map<String, Integer> getAminoMassTable() throws IOException {
+    public static Map<String, Integer> getAminoMassTable() {
         Map<String, Integer> aminoMassTable = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/AminoMassTable.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
@@ -45,11 +50,13 @@ public class DataTableUtils {
                 int mass = Integer.parseInt(tokens[1]);
                 aminoMassTable.put(amino, mass);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Amino mass table not found.");
         }
         return aminoMassTable;
     }
 
-    public static Map<String, Integer> getAminoMassTableNoDuplicates() throws IOException {
+    public static Map<String, Integer> getAminoMassTableNoDuplicates() {
         Map<String, Integer> aminoMassTable = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/AminoMassTableNoDuplicates.txt"))) {
             for(String line = data.readLine(); line != null; line = data.readLine()) {
@@ -58,11 +65,13 @@ public class DataTableUtils {
                 int mass = Integer.parseInt(tokens[1]);
                 aminoMassTable.put(amino, mass);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Amino mass table not found.");
         }
         return aminoMassTable;
     }
 
-    public static Map<Map.Entry, Integer> getScoringMatrix(String fileName) throws IOException {
+    public static Map<Map.Entry, Integer> getScoringMatrix(String fileName) {
         Map<Map.Entry, Integer> scoringMatrix = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader(fileName))) {
             String headerRow = data.readLine();
@@ -78,11 +87,13 @@ public class DataTableUtils {
                             score);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Scoring matrix not found.");
         }
         return scoringMatrix;
     }
 
-    public static List<String> readFASTA(String dataFileName) throws IOException {
+    public static List<String> readFASTA(String dataFileName) {
         List<String> data = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
             String line;
@@ -98,6 +109,8 @@ public class DataTableUtils {
                 }
             }
             data.add(sequence.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("FASTA file not found.");
         }
         return data;
     }

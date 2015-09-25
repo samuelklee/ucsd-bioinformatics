@@ -10,6 +10,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PeptideSpectrum {
+    public static List<Integer> getAminoMassesFromPeptide(String peptide) {
+        Map<String, Integer> aminoMassTable = DataTableUtils.getAminoMassTable();
+        List<Integer> aminoMasses = new ArrayList<>(Arrays.asList());
+        for (int i = 1; i <= peptide.length(); i++) {
+            String amino = peptide.substring(i - 1, i);
+            aminoMasses.add(aminoMassTable.get(amino));
+        }
+        return aminoMasses;
+    }
+
     /**
      * Returns linear spectrum (represented as a list of amino masses) of a peptide.
      * @param peptide   peptide to consider
@@ -66,7 +76,6 @@ public class PeptideSpectrum {
         Collections.sort(spectrum);
         return spectrum;
     }
-
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader((new InputStreamReader(System.in)));
