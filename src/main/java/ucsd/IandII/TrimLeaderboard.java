@@ -24,14 +24,14 @@ public class TrimLeaderboard {
                 scoredPeptides.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .collect(Collectors.toList());
 
-//        System.out.println(sortedScoredPeptides);
+        System.out.println(sortedScoredPeptides);
 
         List<String> sortedLeaderboard = sortedScoredPeptides.stream().map(e -> e.getKey())
                 .collect(Collectors.toList());
         List<Integer> sortedLinearScores = sortedScoredPeptides.stream().map(e -> e.getValue())
                 .collect(Collectors.toList());
 
-        for (int j = numberOfPlaces - 1; j < sortedLeaderboard.size(); j++) {
+        for (int j = numberOfPlaces; j < sortedLeaderboard.size(); j++) {
             if (sortedLinearScores.get(j) < sortedLinearScores.get(numberOfPlaces - 1)) {
                 return sortedLeaderboard.subList(0, j);
             }

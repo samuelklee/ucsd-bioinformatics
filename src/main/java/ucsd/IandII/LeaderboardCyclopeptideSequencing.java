@@ -61,13 +61,12 @@ public class LeaderboardCyclopeptideSequencing {
         List<String> aminos = new ArrayList<>(aminoMassTable.keySet());
 
         List<String> leaderboard = new ArrayList<>(Arrays.asList(""));
-        List<String> previousLeaderboard = new ArrayList<>(Arrays.asList(""));
+        List<String> leaders = new ArrayList<>();
         int parentMass = Collections.max(spectrum);
         int leaderPeptideScore = 0;
         int peptideLength = 1;
         while (!leaderboard.isEmpty() && peptideLength < 50) {
             System.out.println(peptideLength + " " + leaderboard.size());
-            previousLeaderboard = new ArrayList<>(leaderboard);
             leaderboard = expand(leaderboard, aminos);
 //            System.out.println("leaderboard:");
 //            System.out.println(leaderboard);
@@ -79,7 +78,12 @@ public class LeaderboardCyclopeptideSequencing {
                     int peptideScore = CyclopeptideScoring.getCyclicScore(peptide, spectrum);
                     if (peptideScore > leaderPeptideScore) {
                         leaderPeptideScore = peptideScore;
+                        leaders = new ArrayList<>();
+                        leaders.add(peptideString);
+                    } else if (peptideScore == leaderPeptideScore) {
+                        leaders.add(peptideString);
                     }
+
                 } else if (mass > parentMass) {
                     iterator.remove();
                 }
@@ -88,7 +92,7 @@ public class LeaderboardCyclopeptideSequencing {
             peptideLength++;
         }
         System.out.println(leaderPeptideScore);
-        return previousLeaderboard;
+        return leaders;
     }
 
     public static String doWork(String dataFileName) {
@@ -126,7 +130,8 @@ public class LeaderboardCyclopeptideSequencing {
 
     public static void main(String[] args) throws IOException {
 //        String result = doWork("src/test/resources/IandII/dataset_102_7.txt");
-        String result = doWorkSpectrum25("src/test/resources/IandII/dataset_102_9.txt");
+//        String result = doWorkSpectrum25("/home/slee/working/ucsd-bioinformatics/src/test/resources/IandII/Tyrocidine_B1_Spectrum_10.txt");
+        String result = doWorkSpectrum25("/home/slee/working/ucsd-bioinformatics/src/test/resources/IandII/spectrum_25_tyrocidine_b1.txt");
         System.out.println(result);
     }
 }
