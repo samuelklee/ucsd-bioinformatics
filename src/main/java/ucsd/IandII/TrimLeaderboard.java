@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 public class TrimLeaderboard {
     public static List<String> trim(List<String> leaderboard, List<Integer> spectrum, int numberOfPlaces) {
+        if (leaderboard.isEmpty()) {
+            return leaderboard;
+        }
         Map<String, Integer> scoredPeptides = new HashMap<>();
         for (String peptideString : leaderboard) {
             List<Integer> peptide = PeptideSpectrum.getAminoMassesFromPeptide(peptideString);
@@ -20,6 +23,8 @@ public class TrimLeaderboard {
         List<Map.Entry<String, Integer>> sortedScoredPeptides =
                 scoredPeptides.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .collect(Collectors.toList());
+
+//        System.out.println(sortedScoredPeptides);
 
         List<String> sortedLeaderboard = sortedScoredPeptides.stream().map(e -> e.getKey())
                 .collect(Collectors.toList());
