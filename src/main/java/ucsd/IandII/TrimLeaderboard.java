@@ -39,6 +39,36 @@ public class TrimLeaderboard {
         return sortedLeaderboard;
     }
 
+    public static List<String> trimByCyclic(List<String> leaderboard, List<Integer> spectrum, int numberOfPlaces) {
+        if (leaderboard.isEmpty()) {
+            return leaderboard;
+        }
+        Map<String, Integer> scoredPeptides = new HashMap<>();
+        for (String peptideString : leaderboard) {
+            List<Integer> peptide = PeptideSpectrum.getAminoMassesFromPeptide(peptideString);
+            int score = CyclopeptideScoring.getCyclicScore(peptide, spectrum);
+            scoredPeptides.put(peptideString, score);
+        }
+
+        List<Map.Entry<String, Integer>> sortedScoredPeptides =
+                scoredPeptides.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                        .collect(Collectors.toList());
+
+        System.out.println(sortedScoredPeptides);
+
+        List<String> sortedLeaderboard = sortedScoredPeptides.stream().map(e -> e.getKey())
+                .collect(Collectors.toList());
+        List<Integer> sortedLinearScores = sortedScoredPeptides.stream().map(e -> e.getValue())
+                .collect(Collectors.toList());
+
+        for (int j = numberOfPlaces; j < sortedLeaderboard.size(); j++) {
+            if (sortedLinearScores.get(j) < sortedLinearScores.get(numberOfPlaces - 1)) {
+                return sortedLeaderboard.subList(0, j);
+            }
+        }
+        return sortedLeaderboard;
+    }
+
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
             List<String> leaderboard = Arrays.asList(br.readLine().split("\\s+"));

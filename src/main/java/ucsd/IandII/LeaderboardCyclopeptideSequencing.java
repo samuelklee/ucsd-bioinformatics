@@ -22,10 +22,7 @@ public class LeaderboardCyclopeptideSequencing {
         return expandedPeptides;
     }
 
-    public static List<Integer> getLeaderPeptide(List<Integer> spectrum, int numberOfPlaces) {
-        Map<String, Integer> aminoMassTable = DataTableUtils.getAminoMassTableNoDuplicatesSingleAminos();
-        List<String> aminos = new ArrayList<>(aminoMassTable.keySet());
-
+    public static List<Integer> getLeaderPeptide(List<Integer> spectrum, int numberOfPlaces, List<String> aminos) {
         List<String> leaderboard = new ArrayList<>(Arrays.asList(""));
         int parentMass = Collections.max(spectrum);
         List<Integer> leaderPeptide = new ArrayList<>();
@@ -56,10 +53,14 @@ public class LeaderboardCyclopeptideSequencing {
         return leaderPeptide;
     }
 
-    public static List<String> getLeaderboard(List<Integer> spectrum, int numberOfPlaces) {
+    public static List<Integer> getLeaderPeptide(List<Integer> spectrum, int numberOfPlaces) {
         Map<String, Integer> aminoMassTable = DataTableUtils.getAminoMassTableNoDuplicatesSingleAminos();
         List<String> aminos = new ArrayList<>(aminoMassTable.keySet());
 
+        return getLeaderPeptide(spectrum, numberOfPlaces, aminos);
+    }
+
+    public static List<String> getLeaderboard(List<Integer> spectrum, int numberOfPlaces, List<String> aminos) {
         List<String> leaderboard = new ArrayList<>(Arrays.asList(""));
         List<String> leaders = new ArrayList<>();
         int parentMass = Collections.max(spectrum);
@@ -93,6 +94,13 @@ public class LeaderboardCyclopeptideSequencing {
         }
         System.out.println(leaderPeptideScore);
         return leaders;
+    }
+
+    public static List<String> getLeaderboard(List<Integer> spectrum, int numberOfPlaces) {
+        Map<String, Integer> aminoMassTable = DataTableUtils.getAminoMassTableNoDuplicatesSingleAminos();
+        List<String> aminos = new ArrayList<>(aminoMassTable.keySet());
+
+        return getLeaderboard(spectrum, numberOfPlaces, aminos);
     }
 
     public static String doWork(String dataFileName) {

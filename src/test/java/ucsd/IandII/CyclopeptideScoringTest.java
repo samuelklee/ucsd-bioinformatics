@@ -22,5 +22,11 @@ public class CyclopeptideScoringTest {
         String expected = "521";
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void testQuiz() {
+        String result = CyclopeptideScoring.doWork("src/test/resources/IandII/sample/CyclopeptideScoringQuiz.txt");
+        System.out.println(result);
+    }
 }
 

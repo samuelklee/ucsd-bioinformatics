@@ -17,5 +17,11 @@ public class LinearPeptideScoringTest {
         String expected = "274";
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void testQuiz() {
+        String result = LinearPeptideScoring.doWork("src/test/resources/IandII/sample/LinearPeptideScoringQuiz.txt");
+        System.out.println(result);
+    }
 }
 

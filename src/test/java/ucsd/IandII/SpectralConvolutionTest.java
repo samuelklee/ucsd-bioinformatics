@@ -34,5 +34,11 @@ public class SpectralConvolutionTest {
         Collections.sort(expected);
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void testQuiz() {
+        String result = SpectralConvolution.doWork("src/test/resources/IandII/sample/SpectralConvolutionQuiz.txt");
+        System.out.println(result);
+    }
 }
 

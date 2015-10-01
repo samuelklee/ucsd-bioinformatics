@@ -32,7 +32,7 @@ public class TopologicalOrderingTest {
         System.out.println(result);
 
         Map<Object, List<Object>> graph = TopologicalOrdering.readGraph(dataFileName);
-        List<Object> ordering = Arrays.asList(result.split(", "));
+        List<Object> ordering = Arrays.asList((Object[]) result.split(", "));
 
         Assert.assertTrue(isOrderingTopological(ordering, graph));
     }
@@ -44,7 +44,7 @@ public class TopologicalOrderingTest {
         System.out.println(result);
 
         Map<Object, List<Object>> graph = TopologicalOrdering.readGraph(dataFileName);
-        List<Object> ordering = Arrays.asList(result.split(", "));
+        List<Object> ordering = Arrays.asList((Object[]) result.split(", "));
 
         Assert.assertTrue(isOrderingTopological(ordering, graph));
     }

@@ -98,7 +98,7 @@ public class LinearSpaceAlignment {
         int middle = (left + right) / 2;
         Node middleNode = getMiddleNode(scoringMatrix, indelPenalty, v, w, top, bottom, left, right);
         int middleNodeRow = middleNode.row;
-        System.out.println(middleNodeRow + " " + middle + " " + middleNode.action);
+//        System.out.println(middleNodeRow + " " + middle + " " + middleNode.action);
         StringBuilder pathStringBuilder = new StringBuilder();
         pathStringBuilder.append(getLongestPath(scoringMatrix, indelPenalty, v, w, top, middleNodeRow, left, middle));
         pathStringBuilder.append(middleNode.action.toString() + " ");
