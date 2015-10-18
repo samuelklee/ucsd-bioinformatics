@@ -2,7 +2,6 @@ package ucsd.IV;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import ucsd.III.DistanceBetweenLeaves;
 
 public class DistanceBetweenLeavesTest {
     @Test
