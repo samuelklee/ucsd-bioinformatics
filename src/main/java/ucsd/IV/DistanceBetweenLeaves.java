@@ -1,13 +1,11 @@
 package ucsd.IV;
 
 import ucsd.ConsoleCapturer;
-import ucsd.DataTableUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.IntConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,7 +31,7 @@ public class DistanceBetweenLeaves {
         return weightedGraph;
     }
 
-    public static String matrixAsString(List<List<Integer>> matrix) {
+    public static String getMatrixAsString(List<List<Integer>> matrix) {
         return matrix.stream().map(l -> l.stream().map(Object::toString).collect(Collectors.joining(" ")))
                 .collect(Collectors.joining("\n"));
     }
@@ -83,7 +81,7 @@ public class DistanceBetweenLeaves {
                         } else {
                             fullDistanceMatrix.get(destination1).set(destination2, Math.min(currentDistance, weight1 + weight2));
                         }
-//                        System.out.println(matrixAsString(fullDistanceMatrix));
+//                        System.out.println(getMatrixAsString(fullDistanceMatrix));
 //                        System.out.println();
                     }
                 }
@@ -99,9 +97,9 @@ public class DistanceBetweenLeaves {
             Map<Integer, Map<Integer, Integer>> weightedGraph = readWeightedGraph(br);
 
             List<List<Integer>> distanceMatrix = getDistanceMatrix(weightedGraph, n);
-//            System.out.println(matrixAsString(getFullDistanceMatrix(weightedGraph)));
+//            System.out.println(getMatrixAsString(getFullDistanceMatrix(weightedGraph)));
 //            System.out.println();
-            String result = matrixAsString(distanceMatrix);
+            String result = getMatrixAsString(distanceMatrix);
 //            System.out.println(result);
             return ConsoleCapturer.toString(result);
         } catch (IOException e) {

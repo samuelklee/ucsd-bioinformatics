@@ -24,11 +24,6 @@ public class LimbLength {
         return matrix;
     }
 
-    public static String matrixAsString(List<List<Integer>> matrix) {
-        return matrix.stream().map(l -> l.stream().map(Object::toString).collect(Collectors.joining(" ")))
-                .collect(Collectors.joining("\n"));
-    }
-
     public static int getLimbLength(List<List<Integer>> distanceMatrix, int n, int j) {
         int length = 1000000;
         for (int i = 0; i < n; i++) {
