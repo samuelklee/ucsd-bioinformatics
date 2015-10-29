@@ -31,7 +31,7 @@ public class NeighborJoining {
             int j = Integer.parseInt(br.readLine());
 
             List<List<Integer>> distanceMatrix = readMatrix(br);
-
+            String result = "";
             return ConsoleCapturer.toString(result);
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
