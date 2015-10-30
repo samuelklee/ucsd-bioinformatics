@@ -3,7 +3,15 @@ package ucsd.IV;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class UnweightedPairGroupMethodWithArithmeticMeanTest {
+    private static Set<String> outputAsSet(String output) {
+        return new HashSet<>(Arrays.asList(output.split("\n")));
+    }
+
     @Test
     public void test() {
         String result = UnweightedPairGroupMethodWithArithmeticMean.doWork("src/test/resources/IV/sample/UnweightedPairGroupMethodWithArithmeticMean.txt");
@@ -20,7 +28,7 @@ public class UnweightedPairGroupMethodWithArithmeticMeanTest {
                 "5->6:1.833\n" +
                 "6->5:1.833\n" +
                 "6->1:8.833";
-        Assert.assertEquals(result, expected);
+        Assert.assertEquals(outputAsSet(result), outputAsSet(expected));
     }
 
     @Test
@@ -131,6 +139,6 @@ public class UnweightedPairGroupMethodWithArithmeticMeanTest {
                 "51->49:29.874\n" +
                 "52->48:59.289\n" +
                 "52->51:7.884";
-        Assert.assertEquals(result, expected);
+        Assert.assertEquals(outputAsSet(result), outputAsSet(expected));
     }
 }
