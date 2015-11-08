@@ -40,16 +40,6 @@ public class NearestNeighbors {
         return stringBuilder.toString();
     }
 
-    public static String swapString(String string, String a, String b) {
-        if (string.equals(a)) {
-            return b;
-        }
-        if (string.equals(b)) {
-            return a;
-        }
-        return string;
-    }
-
     public static Map<String, List<String>> copyAdjacencyList(Map<String, List<String>> adjacencyList) {
         Map<String, List<String>> adjacencyListCopy = new HashMap<>();
         for (String origin : adjacencyList.keySet()) {

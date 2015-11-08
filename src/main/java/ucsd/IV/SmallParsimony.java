@@ -1,6 +1,7 @@
 package ucsd.IV;
 
 import ucsd.ConsoleCapturer;
+import ucsd.IandII.HammingDistance;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,151 +11,226 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SmallParsimony {
-    public static List<List<Double>> readMatrix(BufferedReader br) {
-        List<List<Double>> matrix = new ArrayList<>();
+    private static Random random = new Random();
+    private static List<String> BASES = Arrays.asList("A", "C", "G", "T");
+
+    public static Map<String, List<String>> readAdjacencyList(BufferedReader br) {
+        Map<String, List<String>> adjacencyList= new HashMap<>();
         String inputString;
         try {
             while ((inputString = br.readLine()) != null) {
-                matrix.add(Arrays.asList(inputString.split("\\s+")).stream().map(Double::parseDouble)
-                        .collect(Collectors.toList()));
+                String[] inputStringArray = inputString.split("->");
+                String origin = inputStringArray[0];
+                String destination = inputStringArray[1];
+                if (!adjacencyList.containsKey(origin)) {
+                    adjacencyList.put(origin, new ArrayList<>());
+                }
+                adjacencyList.get(origin).add(destination);
             }
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
         }
-        return matrix;
+        return adjacencyList;
     }
 
-    public static String getPhylogenyAsString(Map<Integer, Map<Integer, Double>> phylogeny) {
-        StringBuilder phylogenyStringBuilder = new StringBuilder();
-        for (int origin : phylogeny.keySet()) {
-            Map<Integer, Double> edges = phylogeny.get(origin);
-            for (int destination : edges.keySet()) {
-                double weight = edges.get(destination);
-                phylogenyStringBuilder.append(origin).append("->").append(destination).append(":")
-                        .append(String.format("%.3f", weight)).append("\n");
+    public static String getAdjacencyAsString(Map<String, List<String>> adjacencyList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String origin : adjacencyList.keySet()) {
+            for (String destination : adjacencyList.get(origin)) {
+                stringBuilder.append(origin);
+                stringBuilder.append("->");
+                stringBuilder.append(destination);
+                stringBuilder.append("\n");
             }
         }
-        return phylogenyStringBuilder.toString();
-    }
-
-    public static void addEdge(Map<Integer, Map<Integer, Double>> phylogeny, int origin, int destination, double weight) {
-        System.out.println("Adding edge from " + origin + " to " + destination + " with weight " + weight);
-        if (!phylogeny.containsKey(origin)) {
-            phylogeny.put(origin, new HashMap<>());
-        }
-        phylogeny.get(origin).put(destination, weight);
-    }
-
-    public static double getTotalDistance(List<List<Double>> distanceMatrix, int i) {
-        return distanceMatrix.get(i).stream().mapToDouble(Double::doubleValue).sum();
-    }
-
-    public static List<List<Double>> getNeighborJoiningMatrix(List<List<Double>> distanceMatrix) {
-        int n = distanceMatrix.size();
-        List<List<Double>> neighborJoiningMatrix = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            neighborJoiningMatrix.add(new ArrayList<>());
-            for (int j = 0; j < n; j++) {
-                if (i == j) {
-                    neighborJoiningMatrix.get(i).add(0.);
-                } else {
-                    neighborJoiningMatrix.get(i).add((n - 2) * distanceMatrix.get(i).get(j) - getTotalDistance(distanceMatrix, i) - getTotalDistance(distanceMatrix, j));
-                }
-            }
-        }
-        return neighborJoiningMatrix;
-    }
-
-    public static AbstractMap.SimpleEntry<Integer, Integer> findNeighbors(List<List<Double>> neighborJoiningMatrix) {
-        double min = 100000.;
-        AbstractMap.SimpleEntry<Integer, Integer> closestClusters = new AbstractMap.SimpleEntry<>(0, 0);
-        for (int i = 0; i < neighborJoiningMatrix.size(); i++) {
-            for (int j = 0; j < i; j++) {
-                if (neighborJoiningMatrix.get(i).get(j) < min) {
-                    min = neighborJoiningMatrix.get(i).get(j);
-                    closestClusters = new AbstractMap.SimpleEntry<>(i, j);
-                }
-            }
-        }
-        return closestClusters;
-    }
-
-    public static void updateDistanceMatrix(List<List<Double>> distanceMatrix, int i, int j) {
-        List<Double> newRow = new ArrayList<>();
-        for (int m = 0; m < distanceMatrix.size(); m++) {
-            final double distance = 0.5 * (distanceMatrix.get(i).get(m) + distanceMatrix.get(j).get(m) - distanceMatrix.get(i).get(j));
-            newRow.add(distance);
-        }
-        newRow.add(0.);
-        distanceMatrix.add(newRow);
-        for (int m = 0; m < distanceMatrix.size() - 1; m++) {
-            distanceMatrix.get(m).add(distanceMatrix.get(distanceMatrix.size() - 1).get(m));
-        }
-        distanceMatrix.remove(Math.min(i, j));
-        distanceMatrix.remove(Math.max(i, j) - 1);
-        for (List<Double> row : distanceMatrix) {
-            row.remove(Math.min(i, j));
-            row.remove(Math.max(i, j) - 1);
-        }
-    }
-
-    public static String getMatrixAsString(List<List<Double>> matrix) {
-        return matrix.stream().map(l -> l.stream().map(Object::toString).collect(Collectors.joining(" ")))
-                .collect(Collectors.joining("\n"));
-    }
-
-    public static Map<Integer, Map<Integer, Double>> getPhylogeny(List<List<Double>> distanceMatrix, int n, List<Integer> leaves, int numLeaves) {
-        Map<Integer, Map<Integer, Double>> phylogeny = new HashMap<>();
-        if (n == 2) {
-            int destination = numLeaves + 1;
-            double weight = distanceMatrix.get(0).get(1);
-            addEdge(phylogeny, numLeaves, destination, weight);
-            addEdge(phylogeny, destination, numLeaves, weight);
-            return phylogeny;
-        }
-//        System.out.println(getMatrixAsString(distanceMatrix));
-//        System.out.println();
-        List<List<Double>> neighborJoiningMatrix = getNeighborJoiningMatrix(distanceMatrix);
-//        System.out.println(getMatrixAsString(neighborJoiningMatrix));
-//        System.out.println();
-        AbstractMap.SimpleEntry<Integer, Integer> neighbors = findNeighbors(neighborJoiningMatrix);
-        int i = neighbors.getKey();
-        int j = neighbors.getValue();
-        int iName = leaves.get(i);
-        int jName = leaves.get(j);
-        System.out.println("Neighbors " + iName + " and " + jName + " found.\n");
-        leaves.remove(i);
-        leaves.remove(j);
-        double delta = (getTotalDistance(distanceMatrix, i) - getTotalDistance(distanceMatrix, j)) / (n - 2);
-        double limbLengthi = 0.5 * (distanceMatrix.get(i).get(j) + delta);
-        double limbLengthj = 0.5 * (distanceMatrix.get(i).get(j) - delta);
-        updateDistanceMatrix(distanceMatrix, i, j);
-        int newNode = numLeaves + n - 3;
-        leaves.add(newNode);
-        phylogeny = getPhylogeny(distanceMatrix, n - 1, leaves, numLeaves);
-        System.out.println("new " + newNode);
-        addEdge(phylogeny, iName, newNode, limbLengthi);
-        addEdge(phylogeny, newNode, iName, limbLengthi);
-        addEdge(phylogeny, jName, newNode, limbLengthj);
-        addEdge(phylogeny, newNode, jName, limbLengthj);
-        return phylogeny;
+        return stringBuilder.toString();
     }
 
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
             int n = Integer.parseInt(br.readLine());
 
-            List<List<Double>> distanceMatrix = readMatrix(br);
-            Map<Integer, Map<Integer, Double>> phylogeny = getPhylogeny(distanceMatrix, n, new ArrayList<>(IntStream.range(0, n).boxed().collect(Collectors.toList())), n);
-            String result = getPhylogenyAsString(phylogeny);
-            return ConsoleCapturer.toString(result);
+            Map<String, List<String>> adjacencyList = readAdjacencyList(br);
+            BinaryTree tree = initializeBinaryTreeWithScores(adjacencyList);
+            tree.setValues();
+            int score = tree.getSmallParsimonyScore();
+            String result = tree.getSmallParsimonyAdjacencyListString();
+            System.out.println(score + "\n" + result);
+            return ConsoleCapturer.toString(score + "\n" + result);
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
         }
     }
 
     public static void main(String[] args) throws IOException {
-        String result = doWork("src/test/resources/IV/dataset_10333_6.txt");
+        String result = doWork("src/test/resources/IV/dataset_10335_10.txt");
         System.out.println(result);
+    }
+
+    public static class BinaryTree {
+        private static int LARGE_NUMBER = 1000000;
+        private String value;
+        private BinaryTree left, right, parent;
+        private boolean isLeaf, isRoot;
+        private List<List<Integer>> scores; //indexed by string position, ACGT
+        private List<List<List<Boolean>>> consistentWithParent = new ArrayList<>(); //indexed by string position, parent base, ACGT
+
+        public BinaryTree() {}
+
+        public BinaryTree(String value, BinaryTree left, BinaryTree right) {
+            this.value = value;
+            this.left = left;
+            this.right = right;
+            this.isLeaf = (left == null && right == null);
+            if (!isLeaf) {
+                this.left.parent = this;
+                this.right.parent = this;
+            }
+            this.isRoot = false;
+        }
+
+        public void setRoot() {
+            isRoot = true;
+            parent = null;
+        }
+
+        public void setScores(int leafValueLength) {
+            List<List<Integer>> scores = new ArrayList<>(leafValueLength);
+            if (isLeaf) {
+                for (int i = 0; i < leafValueLength; i++) {
+                    scores.add(new ArrayList<>());
+                    for (String base : BASES) {
+                        if (value.substring(i, i + 1).equals(base)) {
+                            scores.get(i).add(0);
+                        } else {
+                            scores.get(i).add(LARGE_NUMBER);
+                        }
+                    }
+                }
+            } else {
+                for (int i = 0; i < leafValueLength; i++) {
+                    scores.add(new ArrayList<>());
+                    left.consistentWithParent.add(new ArrayList<>());
+                    right.consistentWithParent.add(new ArrayList<>());
+                    for (int j = 0; j <  BASES.size(); j++) {
+                        int k = j;
+                        List<Integer> leftScores = left.scores.get(i);
+                        List<Integer> rightScores = right.scores.get(i);
+                        int leftMinScore = Collections.min(IntStream.range(0, BASES.size()).boxed()
+                                .map(b -> leftScores.get(b) + inverseKroneckerDelta(k, b))
+                                .collect(Collectors.toList()));
+                        int rightMinScore = Collections.min(IntStream.range(0, BASES.size()).boxed()
+                                .map(b -> rightScores.get(b) + inverseKroneckerDelta(k, b))
+                                .collect(Collectors.toList()));
+                        int score = leftMinScore + rightMinScore;
+                        scores.get(i).add(score);
+
+                        left.consistentWithParent.get(i).add(IntStream.range(0, BASES.size()).boxed()
+                                .map(b -> leftScores.get(b) + inverseKroneckerDelta(k, b) == leftMinScore).collect(Collectors.toList()));
+                        right.consistentWithParent.get(i).add(IntStream.range(0, BASES.size()).boxed()
+                                .map(b -> rightScores.get(b) + inverseKroneckerDelta(k, b) == rightMinScore).collect(Collectors.toList()));
+                    }
+                }
+            }
+            this.scores = scores;
+        }
+
+        public void setValues() {
+            if (isRoot) {
+                StringBuilder valueBuilder = new StringBuilder();
+                for (List<Integer> score : scores) {
+                    valueBuilder.append(BASES.get(score.indexOf(Collections.min(score))));
+                }
+                value = valueBuilder.toString();
+                left.setValues();
+                right.setValues();
+            } else if (!isLeaf) {
+                StringBuilder valueBuilder = new StringBuilder();
+                for (int i = 0; i < scores.size(); i++) {
+                    int valueIndex = i;
+                    String parentBase = parent.value.substring(i, i + 1);
+                    int parentBaseIndex = BASES.indexOf(parentBase);
+                    List<String> consistentBases =
+                            IntStream.range(0, BASES.size()).boxed().filter(n -> consistentWithParent.get(valueIndex).get(parentBaseIndex).get(n))
+                                    .map(BASES::get).collect(Collectors.toList());
+//                    valueBuilder.append(consistentBases.get(random.nextInt(consistentBases.size())));
+                    if (consistentBases.contains(parentBase)) {
+                        valueBuilder.append(parentBase);
+                    } else {
+                        valueBuilder.append(consistentBases.get(random.nextInt(consistentBases.size())));
+                    }
+                }
+                value = valueBuilder.toString();
+                if (value.equals(parent.value) || (left.isLeaf && value.equals(left.value)) || (right.isLeaf && value.equals(right.value))) {
+                    setValues();
+                }
+                left.setValues();
+                right.setValues();
+            }
+        }
+
+        public int getSmallParsimonyScore() {
+            if (isLeaf) {
+                return 0;
+            }
+            return HammingDistance.getHammingDistance(value, left.value) + HammingDistance.getHammingDistance(value, right.value) + left.getSmallParsimonyScore() + right.getSmallParsimonyScore();
+        }
+
+        public String getSmallParsimonyAdjacencyListString() {
+            if (isLeaf) {
+                return "";
+            }
+            int leftDistance = HammingDistance.getHammingDistance(value, left.value);
+            int rightDistance = HammingDistance.getHammingDistance(value, right.value);
+            String leftEdge = value + "->" + left.value + ":" + leftDistance + "\n"
+                    + left.value + "->" + value + ":" + leftDistance + "\n";
+            String rightEdge = value + "->" + right.value + ":" + rightDistance + "\n"
+                    + right.value + "->" + value + ":" + rightDistance + "\n";
+            return leftEdge + rightEdge + left.getSmallParsimonyAdjacencyListString() + right.getSmallParsimonyAdjacencyListString();
+        }
+    }
+
+    public static int inverseKroneckerDelta(int i, int j) {
+        if (i == j) {
+            return 0;
+        }
+        return 1;
+    }
+
+    public static BinaryTree initializeBinaryTreeWithScores(Map<String, List<String>> adjacencyList) {
+        Set<String> nodesSet = new HashSet<>(adjacencyList.keySet());
+        adjacencyList.keySet().stream().map(adjacencyList::get).flatMap(Collection::stream)
+                .distinct().forEach(nodesSet::add);
+        List<String> nodes = new ArrayList<>(nodesSet);
+        int leafValueLength = Collections.max(nodes.stream().map(String::length).collect(Collectors.toList()));
+
+
+        Map<String, BinaryTree> treeMap = new HashMap<>();
+        int nodeIndex = 0;
+        BinaryTree tree = new BinaryTree();
+        while (nodes.size() > 0) {
+            String node = nodes.get(nodeIndex);
+            if (!adjacencyList.containsKey(node)) {
+                BinaryTree leaf = new BinaryTree(node, null, null);
+                leaf.setScores(leafValueLength);
+                treeMap.put(node, leaf);
+                nodes.remove(node);
+            } else {
+                List<String> childrenOfNode = adjacencyList.get(node);
+                if (treeMap.keySet().containsAll(childrenOfNode)) {
+                    tree = new BinaryTree(node, treeMap.get(childrenOfNode.get(0)), treeMap.get(childrenOfNode.get(1)));
+                    tree.setScores(leafValueLength);
+                    treeMap.put(node, tree);
+                    nodes.remove(node);
+                } else {
+                    nodeIndex++;
+                }
+            }
+            if (nodeIndex >= nodes.size()) {
+                nodeIndex = 0;
+            }
+        }
+        tree.setRoot();
+        return tree;
     }
 }
