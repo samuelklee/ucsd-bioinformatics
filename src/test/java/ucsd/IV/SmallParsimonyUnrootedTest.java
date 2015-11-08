@@ -5,12 +5,13 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SmallParsimonyUnrootedTest {
-    private static Set<String> outputAsSet(String output) {
-        return new HashSet<>(Arrays.asList(output.split("\n")));
-    }
+        private static List<String> outputAsList(String output) {
+                return Arrays.asList(output.split("\n"));
+        }
 
     @Test
     public void test() {
@@ -27,8 +28,8 @@ public class SmallParsimonyUnrootedTest {
                 "CAAGGAAC->CACAGGAT:4\n" +
                 "CAAGGAAC->TGAGTACC:4\n" +
                 "CAAGGAAC->CCAGGCAC:2";
-        //internal nodes labeled differently
-        Assert.assertEquals(outputAsSet(result).size(), outputAsSet(expected).size());
+        Assert.assertEquals(outputAsList(result).get(0), outputAsList(expected).get(0));
+        Assert.assertEquals(outputAsList(result).size(), outputAsList(expected).size());
     }
 
     @Test
@@ -158,8 +159,8 @@ public class SmallParsimonyUnrootedTest {
                 "CAAAATCCGTGGATTCCAATCTCCGAGTTAGC->CAAAATACGTGGATTCCAATCTCGAAGTGAGC:4\n" +
                 "CAAAATCCGTGGATTCCAATCTCCGAGTTAGC->CAGAATCCGTTGTTTCCCCTCTCCGAATTAGC:6\n" +
                 "CAAAATCCGTGGATTCCAATCTCCGAGTTAGC->CAAAACCAAAGAATTCCAATCCACGAGCAACT:11";
-        //internal nodes labeled differently
-        Assert.assertEquals(outputAsSet(result).size(), outputAsSet(expected).size());
+        Assert.assertEquals(outputAsList(result).get(0), outputAsList(expected).get(0));
+        Assert.assertEquals(outputAsList(result).size(), outputAsList(expected).size());
     }
 }
 

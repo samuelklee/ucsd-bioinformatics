@@ -55,7 +55,7 @@ public class SmallParsimony {
             tree.setValues();
             int score = tree.getSmallParsimonyScore();
             String result = tree.getSmallParsimonyAdjacencyListString();
-            System.out.println(score + "\n" + result);
+//            System.out.println(score + "\n" + result);
             return ConsoleCapturer.toString(score + "\n" + result);
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
@@ -161,9 +161,6 @@ public class SmallParsimony {
                     }
                 }
                 value = valueBuilder.toString();
-                if (value.equals(parent.value) || (left.isLeaf && value.equals(left.value)) || (right.isLeaf && value.equals(right.value))) {
-                    setValues();
-                }
                 left.setValues();
                 right.setValues();
             }
@@ -179,6 +176,25 @@ public class SmallParsimony {
         public String getSmallParsimonyAdjacencyListString() {
             if (isLeaf) {
                 return "";
+            }
+            int leftDistance = HammingDistance.getHammingDistance(value, left.value);
+            int rightDistance = HammingDistance.getHammingDistance(value, right.value);
+            String leftEdge = value + "->" + left.value + ":" + leftDistance + "\n"
+                    + left.value + "->" + value + ":" + leftDistance + "\n";
+            String rightEdge = value + "->" + right.value + ":" + rightDistance + "\n"
+                    + right.value + "->" + value + ":" + rightDistance + "\n";
+            return leftEdge + rightEdge + left.getSmallParsimonyAdjacencyListString() + right.getSmallParsimonyAdjacencyListString();
+        }
+        public String getSmallParsimonyUnrootedAdjacencyListString() {
+            if (isLeaf) {
+                return "";
+            }
+            if (isRoot) {
+                int leftDistance = HammingDistance.getHammingDistance(value, left.value);
+                int rightDistance = HammingDistance.getHammingDistance(value, right.value);
+                String edge = left.value + "->" + right.value + ":" + leftDistance + rightDistance + "\n"
+                        + right.value + "->" + left.value + ":" + leftDistance + rightDistance + "\n";
+                return edge + left.getSmallParsimonyAdjacencyListString() + right.getSmallParsimonyAdjacencyListString();
             }
             int leftDistance = HammingDistance.getHammingDistance(value, left.value);
             int rightDistance = HammingDistance.getHammingDistance(value, right.value);
