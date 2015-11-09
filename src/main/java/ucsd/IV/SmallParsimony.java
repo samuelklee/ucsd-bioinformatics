@@ -55,7 +55,7 @@ public class SmallParsimony {
             tree.setValues();
             int score = tree.getSmallParsimonyScore();
             String result = tree.getSmallParsimonyAdjacencyListString();
-//            System.out.println(score + "\n" + result);
+            System.out.println(score + "\n" + result);
             return ConsoleCapturer.toString(score + "\n" + result);
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
@@ -64,7 +64,6 @@ public class SmallParsimony {
 
     public static void main(String[] args) throws IOException {
         String result = doWork("src/test/resources/IV/dataset_10335_10.txt");
-        System.out.println(result);
     }
 
     public static class BinaryTree {
@@ -153,14 +152,18 @@ public class SmallParsimony {
                     List<String> consistentBases =
                             IntStream.range(0, BASES.size()).boxed().filter(n -> consistentWithParent.get(valueIndex).get(parentBaseIndex).get(n))
                                     .map(BASES::get).collect(Collectors.toList());
+                    valueBuilder.append(consistentBases.get(0));
 //                    valueBuilder.append(consistentBases.get(random.nextInt(consistentBases.size())));
-                    if (consistentBases.contains(parentBase)) {
-                        valueBuilder.append(parentBase);
-                    } else {
-                        valueBuilder.append(consistentBases.get(random.nextInt(consistentBases.size())));
-                    }
+//                    if (consistentBases.contains(parentBase)) {
+//                        valueBuilder.append(parentBase);
+//                    } else {
+//                        valueBuilder.append(consistentBases.get(random.nextInt(consistentBases.size())));
+//                    }
                 }
                 value = valueBuilder.toString();
+//                while (value.equals(parent.value) || value.equals(left.value) || value.equals(right.value)) {
+//                    setValues();
+//                }
                 left.setValues();
                 right.setValues();
             }
@@ -171,6 +174,52 @@ public class SmallParsimony {
                 return 0;
             }
             return HammingDistance.getHammingDistance(value, left.value) + HammingDistance.getHammingDistance(value, right.value) + left.getSmallParsimonyScore() + right.getSmallParsimonyScore();
+        }
+
+        public List<String> getLeaves() {
+            if (isLeaf) {
+                return Collections.singletonList(value);
+            }
+            List<String> leaves = new ArrayList<>();
+            leaves.addAll(left.getLeaves());
+            leaves.addAll(right.getLeaves());
+            return leaves;
+        }
+
+        public Map<String, List<String>> asAdjacencyList() {
+            Map<String, List<String>> adjacencyList = new HashMap<>();
+            if (isLeaf) {
+                return adjacencyList;
+            }
+            adjacencyList.put(value, Arrays.asList(left.value, right.value));
+            adjacencyList.put(left.value, Collections.singletonList(value));
+            adjacencyList.put(right.value, Collections.singletonList(value));
+            adjacencyList.putAll(left.asAdjacencyList());
+            adjacencyList.putAll(right.asAdjacencyList());
+            return adjacencyList;
+        }
+
+        public Map<String, List<String>> asUnrootedAdjacencyList() {
+            Map<String, List<String>> adjacencyList = new HashMap<>();
+            if (isLeaf) {
+                return adjacencyList;
+            }
+            if (isRoot) {
+                adjacencyList.put(left.value, new ArrayList<>(Collections.singletonList(right.value)));
+                adjacencyList.put(right.value, new ArrayList<>(Collections.singletonList(left.value)));
+            } else if (parent.isRoot) {
+                String siblingValue = Arrays.asList(parent.left.value, parent.right.value).stream().filter(v -> !value.equals(v)).collect(Collectors.toList()).get(0);
+                adjacencyList.put(value, Arrays.asList(siblingValue, left.value, right.value));
+                adjacencyList.put(left.value, Collections.singletonList(value));
+                adjacencyList.put(right.value, Collections.singletonList(value));
+            } else {
+                adjacencyList.put(value, Arrays.asList(parent.value, left.value, right.value));
+                adjacencyList.put(left.value, Collections.singletonList(value));
+                adjacencyList.put(right.value, Collections.singletonList(value));
+            }
+            adjacencyList.putAll(left.asUnrootedAdjacencyList());
+            adjacencyList.putAll(right.asUnrootedAdjacencyList());
+            return adjacencyList;
         }
 
         public String getSmallParsimonyAdjacencyListString() {
@@ -185,15 +234,15 @@ public class SmallParsimony {
                     + right.value + "->" + value + ":" + rightDistance + "\n";
             return leftEdge + rightEdge + left.getSmallParsimonyAdjacencyListString() + right.getSmallParsimonyAdjacencyListString();
         }
+
         public String getSmallParsimonyUnrootedAdjacencyListString() {
             if (isLeaf) {
                 return "";
             }
             if (isRoot) {
-                int leftDistance = HammingDistance.getHammingDistance(value, left.value);
-                int rightDistance = HammingDistance.getHammingDistance(value, right.value);
-                String edge = left.value + "->" + right.value + ":" + leftDistance + rightDistance + "\n"
-                        + right.value + "->" + left.value + ":" + leftDistance + rightDistance + "\n";
+                int distance = HammingDistance.getHammingDistance(right.value, left.value);
+                String edge = left.value + "->" + right.value + ":" + distance + "\n"
+                        + right.value + "->" + left.value + ":" + distance + "\n";
                 return edge + left.getSmallParsimonyAdjacencyListString() + right.getSmallParsimonyAdjacencyListString();
             }
             int leftDistance = HammingDistance.getHammingDistance(value, left.value);
@@ -219,7 +268,6 @@ public class SmallParsimony {
                 .distinct().forEach(nodesSet::add);
         List<String> nodes = new ArrayList<>(nodesSet);
         int leafValueLength = Collections.max(nodes.stream().map(String::length).collect(Collectors.toList()));
-
 
         Map<String, BinaryTree> treeMap = new HashMap<>();
         int nodeIndex = 0;

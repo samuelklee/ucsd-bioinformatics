@@ -13,8 +13,7 @@ public class SmallParsimonyUnrooted {
     public static Map<String, List<String>> addRoot(Map<String, List<String>> unrootedAdjacencyList) {
         Map<String, List<String>> adjacencyList = new HashMap<>();
         List<String> nodes = new ArrayList<>(unrootedAdjacencyList.keySet());
-        int leafValueLength = Collections.max(nodes.stream().map(String::length).collect(Collectors.toList()));
-        List<String> internalNodes = nodes.stream().filter(s -> s.length() < leafValueLength).collect(Collectors.toList());
+        List<String> internalNodes = nodes.stream().filter(n -> unrootedAdjacencyList.get(n).size() > 1).collect(Collectors.toList());
 
         String edgeNodeA = null;
         String edgeNodeB = null;

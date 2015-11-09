@@ -5,11 +5,13 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LargeParsimonyTest {
-    private static Set<String> outputAsSet(String output) {
-        return new HashSet<>(Arrays.asList(output.split("\n")));
+    private static String getFinalScore(String output) {
+        List<String> outputStrings = Arrays.asList(output.split("\n\n"));
+        return outputStrings.get(outputStrings.size() - 1).split("\n")[0];
     }
 
     @Test
@@ -47,8 +49,7 @@ public class LargeParsimonyTest {
                 "GCAGCGGA->CGACCTGA:4\n" +
                 "GCAGCGGA->GCAGGGTA:2\n" +
                 "GCAGCGGA->GCTGCGGA:1";
-        //internal nodes labeled differently
-        Assert.assertEquals(outputAsSet(result).size(), outputAsSet(expected).size());
+        Assert.assertEquals(getFinalScore(result), getFinalScore(expected));
     }
 
     @Test
@@ -594,8 +595,7 @@ public class LargeParsimonyTest {
                 "AAGAGGAGGGCATGGAAGCCGGGTCCTTCGGACAATGAAG->GAAAGGTGGGCAAGGTAGCCGGGTTCGGCGGACGTTGGAG:11\n" +
                 "AAGAGGAGGGCATGGAAGCCGGGTCCTTCGGACAATGAAG->AAGAGCCGAGCGTGCAGTTCGCGGAGCTAGGACACTGAAG:15\n" +
                 "GGTAGTTCTACACTACTGTGTGTTTTAGTCGATGGAGAGC->GGTAGTTCTGCACGAGAGTTAGGTTTAGCCGAAGGAGACC:10";
-        //internal nodes labeled differently
-        Assert.assertEquals(outputAsSet(result).size(), outputAsSet(expected).size());
+        Assert.assertEquals(getFinalScore(result), getFinalScore(expected));
     }
 }
 

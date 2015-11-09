@@ -65,10 +65,10 @@ public class NearestNeighbors {
                                                                       String a, String b) {
         List<String> aChildren = new ArrayList<>(adjacencyList.get(a));
         aChildren.remove(b);
-        System.out.println(aChildren);
+//        System.out.println(aChildren);
         List<String> bChildren = new ArrayList<>(adjacencyList.get(b));
         bChildren.remove(a);
-        System.out.println(bChildren);
+//        System.out.println(bChildren);
         List<Map<String, List<String>>> neighbors = new ArrayList<>();
         neighbors.add(swapNodes(adjacencyList, a, b, aChildren.get(0), bChildren.get(0)));
         neighbors.add(swapNodes(adjacencyList, a, b, aChildren.get(0), bChildren.get(1)));
