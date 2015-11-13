@@ -98,7 +98,7 @@ public class DataTableUtils {
                 for (int i = 1; i < tokens.size(); i++) {
                     int score = Integer.parseInt(tokens.get(i));
                     scoringMatrix.put(
-                            new AbstractMap.SimpleEntry(aminoRow.charAt(0), aminoColumns.get(i - 1).charAt(0)),
+                            new AbstractMap.SimpleEntry<>(aminoRow.charAt(0), aminoColumns.get(i - 1).charAt(0)),
                             score);
                 }
             }
