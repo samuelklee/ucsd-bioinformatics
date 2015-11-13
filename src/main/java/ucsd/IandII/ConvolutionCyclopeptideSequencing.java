@@ -1,7 +1,6 @@
 package ucsd.IandII;
 
 import ucsd.ConsoleCapturer;
-import ucsd.DataTableUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

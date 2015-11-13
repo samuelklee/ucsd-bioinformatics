@@ -5,7 +5,10 @@ import ucsd.ConsoleCapturer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NearestNeighbors {
     public static Map<String, List<String>> readAdjacencyList(BufferedReader br) {

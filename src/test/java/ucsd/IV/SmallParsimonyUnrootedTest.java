@@ -4,9 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class SmallParsimonyUnrootedTest {
         private static List<String> outputAsList(String output) {

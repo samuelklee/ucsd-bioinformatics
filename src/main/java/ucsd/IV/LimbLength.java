@@ -5,9 +5,10 @@ import ucsd.ConsoleCapturer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class LimbLength {
     public static List<List<Integer>> readMatrix(BufferedReader br) {

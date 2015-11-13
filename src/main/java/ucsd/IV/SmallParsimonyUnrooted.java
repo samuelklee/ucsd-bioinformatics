@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SmallParsimonyUnrooted {
     public static Map<String, List<String>> addRoot(Map<String, List<String>> unrootedAdjacencyList) {

@@ -5,9 +5,11 @@ import ucsd.ConsoleCapturer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class LargeParsimony {
     public static int LARGE_SCORE = 100000;
