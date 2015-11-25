@@ -85,6 +85,21 @@ public class DataTableUtils {
         return aminoMassTable;
     }
 
+    public static Map<String, Integer> getAminoMassTableXZ() {
+        Map<String, Integer> aminoMassTable = new HashMap<>();
+        try (BufferedReader data = new BufferedReader(new FileReader("/home/slee/working/ucsd-bioinformatics/src/test/resources/AminoMassTableXZ.txt"))) {
+            for(String line = data.readLine(); line != null; line = data.readLine()) {
+                String[] tokens = line.split("\\s+");
+                String amino = tokens[0];
+                int mass = Integer.parseInt(tokens[1]);
+                aminoMassTable.put(amino, mass);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Amino mass table not found.");
+        }
+        return aminoMassTable;
+    }
+
     public static Map<Map.Entry, Integer> getScoringMatrix(String fileName) {
         Map<Map.Entry, Integer> scoringMatrix = new HashMap<>();
         try (BufferedReader data = new BufferedReader(new FileReader(fileName))) {
