@@ -43,17 +43,18 @@ public class PeptideIdentification {
     public static String getIdealPeptide(List<Integer> spectralVector, String proteome) {
         int maxScore = 0;
         String idealPeptide = "";
-        System.out.println(spectralVector.size() / 57.);
+//        System.out.println(spectralVector.size() / 57.);
 
+//        for (int length = 1; length < spectralVector.size() / 4. + 1; length++) {
         for (int length = 1; length < spectralVector.size() / 57. + 1; length++) {
-            System.out.println(length);
+//            System.out.println(length);
             Set<String> peptides = MotifEnumeration.getPatterns(Collections.singletonList(proteome), length);
             for (String peptide : peptides) {
                 int score = scorePeptide(spectralVector, peptide);
                 if (score > maxScore) {
                     maxScore = score;
                     idealPeptide = peptide;
-                    System.out.println(peptide);
+//                    System.out.println(peptide);
                 }
             }
         }
