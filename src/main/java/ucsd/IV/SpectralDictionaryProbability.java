@@ -12,13 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SpectralDictionaryProbability {
-//    public static double AMINO_PROBABILITY = 1. / 2.;
-//    public static List<Integer> aminoMasses = new ArrayList<>(DataTableUtils.getAminoMassTableXZ().values());
-
-    public static double AMINO_PROBABILITY = 1. / 20.;
-    public static List<Integer> aminoMasses = new ArrayList<>(DataTableUtils.getAminoMassTable().values());
-
-    public static double getProbability(List<Integer> spectralVector, int i, int score) {
+    public static double getProbability(List<Integer> spectralVector, int i, int score, double aminoProbability, List<Integer> aminoMasses) {
         if (i == 0 && score == 0) {
             return 1.;
         }
@@ -27,28 +21,28 @@ public class SpectralDictionaryProbability {
         }
         double probability = 0.;
         for (int mass : aminoMasses) {
-            probability += AMINO_PROBABILITY * getProbability(spectralVector, i - mass, score - spectralVector.get(i - 1));
+            probability += aminoProbability * getProbability(spectralVector, i - mass, score - spectralVector.get(i - 1), aminoProbability, aminoMasses);
         }
         return probability;
     }
 
-    public static double getDictionaryProbability(List<Integer> spectralVector, int threshold, int maxScore) {
+    public static double getDictionaryProbability(List<Integer> spectralVector, int threshold, int maxScore, double aminoProbability, List<Integer> aminoMasses) {
         double probability = 0.;
         int length = spectralVector.size();
         for (int t = threshold; t <= maxScore; t++) {
-            probability += getProbability(spectralVector, length, t);
+            probability += getProbability(spectralVector, length, t, aminoProbability, aminoMasses);
 //            System.out.println(i + ": " + size);
         }
         return probability;
     }
 
-    public static String doWork(String dataFileName) {
+    public static String doWork(String dataFileName, double aminoProbability, List<Integer> aminoMasses) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
             List<Integer> spectralVector = Arrays.asList(br.readLine().split(" ")).stream().map(Integer::parseInt).collect(Collectors.toList());
             int threshold = Integer.parseInt(br.readLine());
             int maxScore = Integer.parseInt(br.readLine());
 
-            String result = Double.toString(getDictionaryProbability(spectralVector, threshold, maxScore));
+            String result = Double.toString(getDictionaryProbability(spectralVector, threshold, maxScore, aminoProbability, aminoMasses));
 
             return ConsoleCapturer.toString(result);
         } catch (IOException e) {
@@ -57,7 +51,9 @@ public class SpectralDictionaryProbability {
     }
 
     public static void main(String[] args) throws IOException {
-        String result = doWork("src/test/resources/IV/dataset_11866_11.txt");
+        double aminoProbability = 1. / 20.;
+        List<Integer> aminoMasses = new ArrayList<>(DataTableUtils.getAminoMassTable().values());
+        String result = doWork("src/test/resources/IV/dataset_11866_11.txt", aminoProbability, aminoMasses);
         System.out.println(result);
     }
 }
