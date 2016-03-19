@@ -3,7 +3,6 @@ package ucsd.IV;
 import ucsd.ConsoleCapturer;
 import ucsd.DataTableUtils;
 import ucsd.IandII.MotifEnumeration;
-import ucsd.IandII.PeptideSpectrum;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
