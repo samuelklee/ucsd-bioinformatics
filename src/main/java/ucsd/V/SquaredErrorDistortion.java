@@ -12,12 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FarthestFirstTraversal {
+public class SquaredErrorDistortion {
     public static List<List<Double>> readPoints(BufferedReader br) {
         List<List<Double>> points = new ArrayList<>();
         String inputString;
         try {
-            while ((inputString = br.readLine()) != null) {
+            while ((inputString = br.readLine()) != null && !inputString.contains("-")) {
                 points.add(Arrays.asList(inputString.split(" ")).stream().map(Double::parseDouble)
                         .collect(Collectors.toList()));
             }
@@ -39,39 +39,24 @@ public class FarthestFirstTraversal {
         return minDistance;
     }
 
-    public static List<Double> findCenter(List<List<Double>> points, List<List<Double>> centers) {
-        double maxDistance = 0;
-        List<Double> center = points.get(0);
+    public static double findDistortion(List<List<Double>> centers, List<List<Double>> points) {
+        double totalSquaredDistance = 0.;
         for (List<Double> point : points) {
-            double proposedDistance = findDistanceToClosestCenter(point, centers);
-            if (proposedDistance > maxDistance) {
-                maxDistance = proposedDistance;
-                center = point;
-            }
+            double distance = findDistanceToClosestCenter(point, centers);
+            totalSquaredDistance += distance * distance;
         }
-//        System.out.println(maxDistance);
-        return center;
+        return totalSquaredDistance / points.size();
     }
-
-    public static List<List<Double>> findCenters(List<List<Double>> points, int k) {
-        List<List<Double>> centers = new ArrayList<>();
-
-        while (centers.size() < k) {
-            List<Double> center = findCenter(points, centers);
-            centers.add(center);
-        }
-        return centers;
-    }
-
 
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
-            int k = Integer.parseInt(br.readLine().split(" ")[0]);
+            br.readLine();
 
+            List<List<Double>> centers = readPoints(br);
             List<List<Double>> points = readPoints(br);
 
-            List<List<Double>> centers = findCenters(points, k);
-            return ConsoleCapturer.toString(centers.stream().map(c -> c.stream().map(Object::toString).collect(Collectors.joining(" "))).collect(Collectors.joining("\n")));
+            double distortion = findDistortion(centers, points);
+            return ConsoleCapturer.toString(String.format("%.3f", distortion));
         } catch (IOException e) {
             throw new RuntimeException("Input file not found.");
         }
@@ -80,9 +65,9 @@ public class FarthestFirstTraversal {
     public static void main(String[] args) throws IOException {
 //        List<List<Double>> pointsQuiz = Arrays.asList(Doubles.asList(2, 6), Doubles.asList(4, 9), Doubles.asList(5, 7), Doubles.asList(6, 5), Doubles.asList(8, 3));
 //        List<List<Double>> centersQuiz = Arrays.asList(Doubles.asList(4, 5), Doubles.asList(7, 4));
-//        findCenter(pointsQuiz, centersQuiz);
+//        System.out.println(findDistortion(centersQuiz, pointsQuiz));
 
-        String result = doWork("src/test/resources/V/dataset_10926_14.txt");
+        String result = doWork("src/test/resources/V/dataset_10927_3.txt");
         System.out.println(result);
     }
 }
