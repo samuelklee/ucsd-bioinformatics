@@ -12,8 +12,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class LloydAlgorithm {
+public class SoftKMeansClustering {
     public static List<List<Double>> readPoints(BufferedReader br) {
         List<List<Double>> points = new ArrayList<>();
         String inputString;
@@ -32,48 +33,50 @@ public class LloydAlgorithm {
         return new EuclideanDistance().compute(Doubles.toArray(point1), Doubles.toArray(point2));
     }
 
-    public static int findIndexOfClosestCenter(List<Double> point, List<List<Double>> centers) {
-        double minDistance = 10000000.;
-        int index = 0;
-        for (int i = 0; i < centers.size(); i++) {
+    public static double findUnnormalizedResponsibility(List<Double> point, List<Double> center, double beta) {
+        return Math.exp(-beta * findDistance(point, center));
+    }
+
+    public static List<List<Double>> findResponsibilities(List<List<Double>> points, List<List<Double>> centers, int k, double beta) {
+        List<List<Double>> responsibilities = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            responsibilities.add(new ArrayList<>());
             List<Double> center = centers.get(i);
-            double proposedDistance = findDistance(center, point);
-            if (proposedDistance < minDistance) {
-                minDistance = proposedDistance;
-                index = i;
+            for (List<Double> point : points) {
+                double responsibility = findUnnormalizedResponsibility(point, center, beta);
+                responsibilities.get(i).add(responsibility);
             }
         }
-        return index;
+
+        int n = points.size();
+        for (int j = 0; j < n; j++) {
+            final int point = j;
+            double normalization = IntStream.range(0, k).mapToDouble(i -> responsibilities.get(i).get(point)).sum();
+            IntStream.range(0, k).forEach(i -> responsibilities.get(i).set(point, responsibilities.get(i).get(point) / normalization));
+        }
+
+        return responsibilities;
     }
 
-    public static List<List<List<Double>>> findClusters(List<List<Double>> points, List<List<Double>> centers, int k) {
-        List<List<List<Double>>> clusters = new ArrayList<>();
-        for (int i = 0; i < k; i++) {
-            clusters.add(new ArrayList<>());
-        }
-        for (List<Double> point : points) {
-            int index = findIndexOfClosestCenter(point, centers);
-            clusters.get(index).add(point);
-        }
-        return clusters;
-    }
-
-    public static List<Double> findCenterOfGravity(List<List<Double>> points, int m) {
+    public static List<Double> findWeightedPoint(List<Double> responsibilitiesPerPoint, List<List<Double>> points, int m) {
         List<Double> center = new ArrayList<>(Collections.nCopies(m, 0.));
         int n = points.size();
-        for (List<Double> point : points) {
-            for (int i = 0; i < m; i++) {
-                center.set(i, center.get(i) + point.get(i) / n);
+        for (int i = 0; i < n; i++) {
+            List<Double> point = points.get(i);
+            double responsibility = responsibilitiesPerPoint.get(i);
+            double responsibilityTotal = responsibilitiesPerPoint.stream().mapToDouble(Double::doubleValue).sum();
+            for (int j = 0; j < m; j++) {
+                center.set(j, center.get(j) + point.get(j) * responsibility / responsibilityTotal);
             }
         }
         return center;
     }
 
-    public static List<List<Double>> findCenters(List<List<List<Double>>> clusters, int k, int m) {
+    public static List<List<Double>> findCenters(List<List<Double>> responsibilities, List<List<Double>> points, int k, int m) {
         List<List<Double>> newCenters = new ArrayList<>(k);
 
-        for (List<List<Double>> cluster : clusters) {
-            newCenters.add(findCenterOfGravity(cluster, m));
+        for (List<Double> responsibilitiesPerCluster : responsibilities) {
+            newCenters.add(findWeightedPoint(responsibilitiesPerCluster, points, m));
         }
         return newCenters;
     }
@@ -81,19 +84,20 @@ public class LloydAlgorithm {
 
     public static String doWork(String dataFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(dataFileName))) {
-            int maxIterations = 1000;
+            int maxIterations = 100;
             String[] kmString = br.readLine().split(" ");
             int k = Integer.parseInt(kmString[0]);
             int m = Integer.parseInt(kmString[1]);
+
+            double beta = Double.parseDouble(br.readLine());
 
             List<List<Double>> points = readPoints(br);
 
             List<List<Double>> centers = points.subList(0, k);
             int iteration = 0;
             while (iteration < maxIterations) {
-                List<List<List<Double>>> clusters = findClusters(points, centers, k);
-                List<List<Double>> newCenters = findCenters(clusters, k, m);
-
+                List<List<Double>> responsibilities = findResponsibilities(points, centers, k, beta);
+                List<List<Double>> newCenters = findCenters(responsibilities, points, k, m);
                 if (centers == newCenters) {
                     break;
                 }
@@ -108,10 +112,7 @@ public class LloydAlgorithm {
     }
 
     public static void main(String[] args) throws IOException {
-//        List<List<Double>> pointsQuiz = Arrays.asList(Doubles.asList(1, 3, -1), Doubles.asList(9, 8, 14), Doubles.asList(6, 2, 10), Doubles.asList(4, 3, 1));
-//        System.out.println(findCenterOfGravity(pointsQuiz, 3));
-
-        String result = doWork("src/test/resources/V/dataset_10928_3.txt");
+        String result = doWork("src/test/resources/V/dataset_10933_7.txt");
         System.out.println(result);
     }
 }
